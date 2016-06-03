@@ -1,5 +1,5 @@
 # AHNoise
-A procedural, cohesive, modular noise library build using Metal and Swift
+A procedural, cohesive, modular noise library built using Metal and Swift
 
 All files are marked up
 
