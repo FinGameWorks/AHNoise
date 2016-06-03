@@ -2,8 +2,8 @@
 //  AppDelegate.swift
 //  AHNoiseExample
 //
-//  Created by App Work on 02/06/2016.
-//  Copyright © 2016 App Work. All rights reserved.
+//  Created by Andrew Heard on 02/06/2016.
+//  Copyright © 2016 Andrew Heard. All rights reserved.
 //
 
 import UIKit

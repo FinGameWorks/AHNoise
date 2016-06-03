@@ -127,7 +127,7 @@ public class AHNModifierScaleCanvas: NSObject, AHNTextureProvider {
   
   
   
-  /// The scale of the input when inserted into the canvas. If an input had a width of 256, which is being resized to 512 with a scale of 0.5, the width of the input would be 128 in the canvas of 512. Default value is 1.0.
+  ///The scale of the input when inserted into the canvas. If an input had a width of 256, which is being resized to 512 with a scale of 0.5, the width of the input would be 128 in the canvas of 512. Default value is 1.0.
   public var xScale: Float{
     get{
       return scale.z
@@ -140,7 +140,7 @@ public class AHNModifierScaleCanvas: NSObject, AHNTextureProvider {
   
   
   
-  /// The scale of the input when inserted into the canvas. If an input had a height of 256, which is being resized to 512 with a scale of 0.5, the height of the input would be 128 in the canvas of 512. Default value is 1.0.
+  ///The scale of the input when inserted into the canvas. If an input had a height of 256, which is being resized to 512 with a scale of 0.5, the height of the input would be 128 in the canvas of 512. Default value is 1.0.
   public var yScale: Float{
     get{
       return scale.w

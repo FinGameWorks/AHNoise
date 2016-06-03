@@ -53,7 +53,7 @@ public class AHNModifierColour: AHNModifier {
   
   
   
-  /// The colour to apply to the input.
+  ///The colour to apply to the input.
   private var _colours: [UIColor] = []
   
   
@@ -67,7 +67,7 @@ public class AHNModifierColour: AHNModifier {
   private var _intensities: [Float] = []
   
   
-  /// The colour to apply to the input.  Must match the order of `positions` and `intensities`.
+  ///The colour to apply to the input.  Must match the order of `positions` and `intensities`.
   public var colourInfo: [(colour: UIColor, position: Float, intensity: Float)]{
     get{
       var tuples: [(colour: UIColor, position: Float, intensity: Float)] = []

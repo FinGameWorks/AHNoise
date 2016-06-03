@@ -51,6 +51,7 @@
 		96275B3E1D00AC9F004BAB53 /* Selectors.metal in Sources */ = {isa = PBXBuildFile; fileRef = 96275B171D00AC9F004BAB53 /* Selectors.metal */; };
 		96275B3F1D00AC9F004BAB53 /* UIImage+AHNoise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B181D00AC9F004BAB53 /* UIImage+AHNoise.swift */; };
 		96275B411D00AD56004BAB53 /* AHNTextureProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B401D00AD56004BAB53 /* AHNTextureProvider.swift */; };
+		96275B431D01BBA8004BAB53 /* Licence in Resources */ = {isa = PBXBuildFile; fileRef = 96275B421D01BBA8004BAB53 /* Licence */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -100,6 +101,7 @@
 		96275B171D00AC9F004BAB53 /* Selectors.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Selectors.metal; path = AHNoise/Selectors.metal; sourceTree = SOURCE_ROOT; };
 		96275B181D00AC9F004BAB53 /* UIImage+AHNoise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "UIImage+AHNoise.swift"; path = "AHNoise/UIImage+AHNoise.swift"; sourceTree = SOURCE_ROOT; };
 		96275B401D00AD56004BAB53 /* AHNTextureProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNTextureProvider.swift; path = AHNoise/AHNTextureProvider.swift; sourceTree = SOURCE_ROOT; };
+		96275B421D01BBA8004BAB53 /* Licence */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Licence; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -153,6 +155,7 @@
 				96275AF71D00AC9F004BAB53 /* AHNCombinerMin.swift */,
 				96275AF81D00AC9F004BAB53 /* AHNCombinerMultiply.swift */,
 				96275AF91D00AC9F004BAB53 /* AHNCombinerPower.swift */,
+				96275B421D01BBA8004BAB53 /* Licence */,
 				96275AFA1D00AC9F004BAB53 /* AHNCombinerSubtract.swift */,
 				96275AFB1D00AC9F004BAB53 /* AHNContext.swift */,
 				96275AFC1D00AC9F004BAB53 /* AHNGenerator.swift */,
@@ -250,6 +253,7 @@
 			files = (
 				960494E21D00778E009B4F6D /* LaunchScreen.storyboard in Resources */,
 				960494DF1D00778E009B4F6D /* Assets.xcassets in Resources */,
+				96275B431D01BBA8004BAB53 /* Licence in Resources */,
 				960494DD1D00778E009B4F6D /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
