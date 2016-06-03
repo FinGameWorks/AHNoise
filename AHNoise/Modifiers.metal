@@ -245,37 +245,49 @@ kernel void normalMapModifier(texture2d<float, access::read> inTexture [[texture
 
 
 // Colour Modifier
-struct ColourProperties{
-  float4 colour;
-  float4 props;
-};
-
 kernel void colourModifier(texture2d<float, access::read> inTexture [[texture(0)]],
                             texture2d<float, access::write> outTexture [[texture(1)]],
-                            constant ColourProperties &uniforms [[buffer(0)]],
+                            const device float4 *uniforms [[buffer(0)]],
+                            const device float *positions [[buffer(1)]],
+                            const device float *intensities [[buffer(2)]],
+                            constant int &count [[buffer(3)]],
                             uint2 gid [[thread_position_in_grid]])
 {
   float4 in = inTexture.read(gid);
-  float out = (in.r+in.g+in.b)/3;
-
-  float3 c = uniforms.colour.rgb;
-  float p = uniforms.props.x;
-  float lr = uniforms.props.y;
-  float ur = uniforms.props.z;
-  float l = p - lr;
-  float u = p + ur;
-
-  float3 o = in.rgb;
-  if (out >= l && out <= p){
-    float fac = (out - l) / lr;
-    o = mix(in.rgb, c, fac);
-  }
-  if (out > p && out <= u){
-    float fac = (u - out) / ur;
-    o = mix(in.rgb, c, fac);
+  float ave = (in.r+in.g+in.b)/3;
+  
+  int colourCount = count;
+  float4 out;
+  
+  float4 c1; float4 c2;
+  float p1; float p2;
+  float i1; float i2;
+  
+  for (int i = 0; i < colourCount; i++){
+    float p = positions[i];
+    if (ave < p){
+      c1 = i == 0 ? uniforms[i] : uniforms[i-1];
+      c2 = uniforms[i];
+      p1 = i == 0 ? 0 : positions[i-1];
+      p2 = p;
+      i1 = i == 0 ? intensities[i] : intensities[i-1];
+      i2 = intensities[i];
+      break;
+    }
+    c1 = uniforms[colourCount-1];
+    c2 = uniforms[colourCount-1];
+    p1 = positions[colourCount-1];
+    p2 = 1;
+    i1 = intensities[colourCount-1];
+    i2 = intensities[colourCount-1];
   }
   
-  outTexture.write(float4(o,1), gid);
+  float weight = (ave - p1)/(p2 - p1);
+  out = mix(c1, c2, weight);
+  float inten = (i2 * weight) + (i1 * (1-weight));
+  out = mix(in, out, inten);
+  
+  outTexture.write(out, gid);
 }
 
 // Rotate Modifier
