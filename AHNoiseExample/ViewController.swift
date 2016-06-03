@@ -22,7 +22,7 @@ class ViewController: UIViewController {
     let loop = AHNModifierLoop(input: simplex, loopEvery: 0.2)
     loop.normalise = true
     
-    let shift = AHNModifierScaleBias(input: loop, scale: 0.8, bias: 0.2)
+    let shift = AHNModifierScaleBias(input: loop, scale: 0.6, bias: 0.4)
     
     
     // Create the grain
@@ -40,9 +40,11 @@ class ViewController: UIViewController {
     
     let combine = AHNCombinerMultiply(input1: brown, input2: multiply)
     
+    let stretch2 = AHNModifierStretch(input: combine, xStretchFactor: 1, yStretchFactor: 4	)
+    
     let imageView = UIImageView(frame: view.bounds)
     view.addSubview(imageView)
-    imageView.image = combine.uiImage()
+    imageView.image = stretch2.uiImage()
   }
 }
 
