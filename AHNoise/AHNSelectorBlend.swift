@@ -14,24 +14,77 @@ import simd
 /**
  Blends two input `AHNTextureProvider`s together using a weight from a third input `AHNTextureProvider` used as the `selector`.
  
- The input `AHNTextureProvider`s may range from a value of -1.0 - 1.0 [0.0 - 1.0 in colour space]. This value is taken from the `selector` for each pixel to provide a mixing weight for the two `input`s. A value of -1.0 [0.0] will output 100% `input1` and 0% `input2`, while a value of 1.0 [1.0] will output 100% `input2` and 0% `input1`. A value of -0.5 [0.25] will output a mixture of 75% `input1` and 25% `input2`.
+ The input `AHNTextureProvider`s may range from a value of `0.0 - 1.0`. This value is taken from the `selector` for each pixel to provide a mixing weight for the two `provider`s. A value of `0.0` will output 100% `provider` and 0% `provider2`, while a value of `1.0` will output 100% `provider2` and 0% `provider`. A value of `0.25` will output a mixture of 75% `provider` and 25% `provider2`.
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
 public class AHNSelectorBlend: AHNSelector {
   
-  
+  var allowableControls: [String] = []
+
   // MARK:- Initialiser
   
+
+  required public init(){
+    super.init(functionName: "blendSelector")
+  }
   
-  /**
-   Creates a new `AHNSelectorBlend` object.
-   
-   - parameter input1: The first input that will be combined with `input2` using `selector` to provide the output.
-   - parameter input2: The second input that will be combined with `input1` using `selector` to provide the output.
-   - parameter selector: The `AHNTextureProvider` that selects how much of each input to write to the output `MTLTexture` depending on its value at each pixel.
-   */
-  public init(input1: AHNTextureProvider, input2: AHNTextureProvider, selector: AHNTextureProvider){
-    super.init(functionName: "blendSelector", input1: input1, input2: input2, selector: selector)
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  // MARK:- NSCoding
+  public func encodeWithCoder(aCoder: NSCoder) {
+    var mirror = Mirror(reflecting: self)
+    repeat{
+      for child in mirror.children{
+        if allowableControls.contains(child.label!){
+          if child.value is Int{
+            aCoder.encodeInteger(child.value as! Int, forKey: child.label!)
+          }
+          if child.value is Float{
+            aCoder.encodeFloat(child.value as! Float, forKey: child.label!)
+          }
+          if child.value is Bool{
+            aCoder.encodeBool(child.value as! Bool, forKey: child.label!)
+          }
+        }
+      }
+      mirror = mirror.superclassMirror()!
+    }while String(mirror.subjectType).hasPrefix("AHN")
+  }
+  
+  public required init?(coder aDecoder: NSCoder) {
+    super.init(functionName: "blendSelector")
+    var mirror = Mirror(reflecting: self.dynamicType.init())
+    repeat{
+      for child in mirror.children{
+        if allowableControls.contains(child.label!){
+          if child.value is Int{
+            let val = aDecoder.decodeIntegerForKey(child.label!)
+            setValue(val, forKey: child.label!)
+          }
+          if child.value is Float{
+            let val = aDecoder.decodeFloatForKey(child.label!)
+            setValue(val, forKey: child.label!)
+          }
+          if child.value is Bool{
+            let val = aDecoder.decodeBoolForKey(child.label!)
+            setValue(val, forKey: child.label!)
+          }
+        }
+      }
+      mirror = mirror.superclassMirror()!
+    }while String(mirror.subjectType).hasPrefix("AHN")
   }
 }

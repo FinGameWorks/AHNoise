@@ -10,7 +10,7 @@
 #include <metal_math>
 using namespace metal;
 
-// MARK: - Raw simplex functions
+// MARK:- Raw simplex functions
 
 static constant float3 grad3 [12] = {float3(1,1,0),float3(-1,1,0),float3(1,-1,0),float3(-1,-1, 0),float3(1,0,1),float3(-1,0,1),float3(1,0,-1),float3(-1,0,-1),float3(0,1,1),float3(0,-1,1),float3(0,1,-1),float3(0,-1,-1)};
 
@@ -300,6 +300,38 @@ float simplex4D(float xin, float yin, float zin, float win)
 
 
 
+float grey(float4 in);
+float grey(float4 in){
+  return ((in.x + in.y + in.z)/3)-0.5;
+}
+
+float3 rotatePoints(float3 points, float3 angles, float3 centre);
+float3 rotatePoints(float3 points, float3 angles, float3 centre){
+  
+  points -= centre;
+  
+  float3x3 rx = float3x3(1.0);
+  rx[1][1] = cos(angles.x);
+  rx[2][1] = -sin(angles.x);
+  rx[1][2] = sin(angles.x);
+  rx[2][2] = rx[1][1];
+  
+  float3x3 ry = float3x3(1.0);
+  ry[0][0] = cos(angles.y);
+  ry[0][2] = -sin(angles.y);
+  ry[2][0] = sin(angles.y);
+  ry[2][2] = ry[0][0];
+  
+  float3x3 rz = float3x3(1.0);
+  rz[0][0] = cos(angles.z);
+  rz[1][0] = -sin(angles.z);
+  rz[0][1] = sin(angles.z);
+  rz[1][1] = rz[0][0];
+  
+  points *= (rx * ry * rz);
+  points += centre;
+  return points;
+}
 
 
 
@@ -311,58 +343,143 @@ float simplex4D(float xin, float yin, float zin, float win)
 
 
 
+// MARK:- Voronoi Generator
 
 
-
-
-
-
-
-
-
-
-
-// MARK: - Simplex Kernels
-
-struct SimplexInputs{
+struct VoronoiInputs {
   float2 pos;
+  float2 offsetStrength;
+  float3 rotations;
   int octaves;
   float persistance;
   float frequency;
   float lacunarity;
-  float z;
-  float w;
-  int useFourD;
+  float zValue;
+  float wValue;
   int sphereMap;
   int seamless;
 };
 
-kernel void simplexGenerator(texture2d<float, access::write> outTexture [[texture(0)]],
-                             constant SimplexInputs &uniforms [[buffer(0)]],
+
+float4 getCellPoint(int4 cell, float frequency);
+float4 getCellPoint(int4 cell, float frequency){
+  float4 cellBase = float4(cell) / frequency;
+  float noiseX = (simplex4D(cell.x, cell.y, cell.z, cell.w)+1)/3;
+  float noiseY = (simplex4D(cell.z, cell.w, cell.y, cell.x)+1)/3;
+  float noiseZ = (simplex4D(cell.y, cell.x, cell.w, cell.z)+1)/3;
+  float noiseW = (simplex4D(cell.w, cell.z, cell.x, cell.y)+1)/3;
+  return cellBase + (0.5 + (1.5 * float4(noiseX, noiseY, noiseZ, noiseW))) / frequency;
+}
+
+
+
+float pythagorean(float4 p1, float4 p2);
+float pythagorean(float4 p1, float4 p2){
+  return distance(p1, p2);
+}
+
+float manhattan(float4 p1, float4 p2);
+float manhattan(float4 p1, float4 p2){
+  float x = p1.x - p2.x;
+  float y = p1.y - p2.y;
+  return abs(x) + abs(y);
+}
+
+float chebyshev(float4 p1, float4 p2);
+float chebyshev(float4 p1, float4 p2){
+  float x = p1.x - p2.x;
+  float y = p1.y - p2.y;
+  if (abs(x) <= abs(y)){
+    return abs(x);
+  }
+  return abs(y);
+}
+
+float quadratic(float4 p1, float4 p2);
+float quadratic(float4 p1, float4 p2){
+  float x = p1.x - p2.x;
+  float y = p1.y - p2.y;
+  return x*x + x*y + y*y;
+}
+
+float minkowski(float4 p1, float4 p2, float c);
+float minkowski(float4 p1, float4 p2, float c){
+  float x = p1.x - p2.x;
+  float y = p1.y - p2.y;
+  return pow(pow(abs(x),c) + pow(abs(y),c), (1/c));
+}
+
+
+
+float worley(float4 coo, float frequency);
+float worley(float4 coo, float frequency){
+  int4 cell = int4(coo * frequency);
+  float dist = 1.0;
+  float dist2 = 1.0;
+  
+
+  for (int x = -2; x < 2; x++) {
+    for (int y = -2; y < 2; y++) {
+      for (int z = -2; z < 2; z++) {
+        for (int w = -2; w < 2; w++) {
+          float4 cellPoint = getCellPoint(cell + int4(x, y, z, w), frequency);
+          float d = pythagorean(cellPoint, coo);
+          if (d < dist){
+            dist2 = dist;
+            dist = d;
+          }else if (d < dist2){
+            dist2 = d;
+          }
+        }
+      }
+    }
+  }
+  
+  dist /= length(float2(1.0 / frequency));
+  dist2 /= length(float2(1.0 / frequency));
+  return dist2-dist;
+}
+
+
+kernel void voronoiGenerator(texture2d<float, access::write> outTexture [[texture(0)]],
+                             texture2d<float, access::read> xoffset [[texture(1)]],
+                             texture2d<float, access::read> yoffset [[texture(2)]],
+                             constant VoronoiInputs &uniforms [[buffer(0)]],
                              uint2 gid [[thread_position_in_grid]],
                              uint2 threads [[threads_per_grid]])
 {
+  float2 p = uniforms.pos;
+  float xFrac = (float(gid.x) / float(threads.x))+p.x;
+  float yFrac = (float(gid.y) / float(threads.y))+p.y;
+  float3 centre = float3(0.5+p.x, 0.5+p.y, uniforms.zValue);
+  float3 rot = rotatePoints(float3(xFrac,yFrac,uniforms.zValue), uniforms.rotations, centre);
+  xFrac = rot.x;
+  yFrac = rot.y;
+  float z = rot.z;
+  float w = uniforms.wValue;
+  
+  float disStren = uniforms.offsetStrength.x;
+  float dx = grey(xoffset.read(gid)) * disStren;
+  float dy = grey(yoffset.read(gid)) * disStren;
+  
   float total = 0.0;
   float amplitude = 1.0;
   float maxAmplitude = 0.0;
-  int use4D = uniforms.useFourD;
-  int sphereMap = uniforms.sphereMap;
-  int seamless = uniforms.seamless;
-  
   int octaves = uniforms.octaves;
   float freq = uniforms.frequency;
   float lacunarity = uniforms.lacunarity;
   float persistance = uniforms.persistance;
-  float x = uniforms.pos.x + (float(gid.x)/float(threads.x));
-  float y = uniforms.pos.y + (float(gid.y)/float(threads.y));
-  float z = uniforms.z;
-  float w = uniforms.w;
+  int seamless = uniforms.seamless;
+  int sphereMap = uniforms.sphereMap;
+  
+  float x = xFrac+dx;
+  float y = yFrac+dy;
   
   if (sphereMap != 0){
     float pi = 3.14159265;
-    float xx = cos(pi*2*y)*sin(pi*x);
-    float yy = sin(pi*2*y)*sin(pi*x);
-    z = cos(pi*x);
+    float xx = cos(pi*2*x)*sin(pi*y);
+    float yy = sin(pi*2*x)*sin(pi*y);
+    z = cos(pi*y);
     x = xx;
     y = yy;
   }
@@ -378,6 +495,113 @@ kernel void simplexGenerator(texture2d<float, access::write> outTexture [[textur
     y = ny;
     z = nz;
     w = nw;
+  }
+  for (int j = 0; j < octaves; ++j){
+    total += worley(float4(x, y, z, w), freq) * amplitude;
+    
+    freq *= lacunarity;
+    maxAmplitude += amplitude;
+    amplitude *= persistance;
+  }
+  
+  float r = total / maxAmplitude;
+  
+  
+  outTexture.write(float4(float3(r), 1),gid);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// MARK:- Simplex Kernels
+
+struct CoherentInputs{
+  float2 pos;
+  float3 rotations;
+  int octaves;
+  float persistance;
+  float frequency;
+  float lacunarity;
+  float z;
+  float w;
+  float offsetStrength;
+  int useFourD;
+  int sphereMap;
+  int seamless;
+};
+
+
+
+kernel void simplexGenerator(texture2d<float, access::write> outTexture [[texture(0)]],
+                             texture2d<float, access::read> xoffset [[texture(1)]],
+                             texture2d<float, access::read> yoffset [[texture(2)]],
+                             constant CoherentInputs &uniforms [[buffer(0)]],
+                             uint2 gid [[thread_position_in_grid]],
+                             uint2 threads [[threads_per_grid]])
+{
+  float total = 0.0;
+  float amplitude = 1.0;
+  float maxAmplitude = 0.0;
+  float disStren = uniforms.offsetStrength;
+  int use4D = uniforms.useFourD;
+  int sphereMap = uniforms.sphereMap;
+  int seamless = uniforms.seamless;
+  
+  int octaves = uniforms.octaves;
+  float freq = uniforms.frequency;
+  float lacunarity = uniforms.lacunarity;
+  float persistance = uniforms.persistance;
+  float x = uniforms.pos.x + (float(gid.x)/float(threads.x)) + (grey(xoffset.read(gid)) * disStren);
+  float y = uniforms.pos.y + (float(gid.y)/float(threads.y)) + (grey(yoffset.read(gid)) * disStren);
+  float z = uniforms.z;
+  float3 centre = float3(uniforms.pos.x + 0.5, uniforms.pos.y + 0.5, z);
+  float3 rot = rotatePoints(float3(x,y,z), uniforms.rotations, centre);
+  x = rot.x;
+  y = rot.y;
+  z = rot.z;
+  float w = uniforms.w;
+  
+  if (sphereMap != 0){
+    float pi = 3.14159265;
+    float xx = cos(pi*2*x)*sin(pi*y);
+    float yy = sin(pi*2*x)*sin(pi*y);
+    z = cos(pi*y);
+    x = xx;
+    y = yy;
+  }
+  
+  if (seamless != 0){
+    float pi = 3.14159265;
+    
+    float nx = cos(2*pi*x);
+    float ny = cos(2*pi*y);
+    float nz = sin(2*pi*x);
+    float nw = sin(2*pi*y);
+    x = nx;
+    y = ny;
+    z = nz;
+    w = nw;
+    freq /= pi;
   }
   
   for (int j = 0; j < octaves; ++j){
@@ -396,15 +620,20 @@ kernel void simplexGenerator(texture2d<float, access::write> outTexture [[textur
   outTexture.write(float4(r,r,r,1),gid);
 }
 
-// MARK: - Billow Kernel
+
+
+// MARK:- Billow Kernel
 kernel void billowGenerator(texture2d<float, access::write> outTexture [[texture(0)]],
-                            constant SimplexInputs &uniforms [[buffer(0)]],
+                            texture2d<float, access::read> xoffset [[texture(1)]],
+                            texture2d<float, access::read> yoffset [[texture(2)]],
+                            constant CoherentInputs &uniforms [[buffer(0)]],
                             uint2 gid [[thread_position_in_grid]],
                             uint2 threads [[threads_per_grid]])
 {
   float total = 0.0;
   float amplitude = 1.0;
   float maxAmplitude = 0.0;
+  float disStren = uniforms.offsetStrength;
   int use4D = uniforms.useFourD;
   int sphereMap = uniforms.sphereMap;
   int seamless = uniforms.seamless;
@@ -413,16 +642,21 @@ kernel void billowGenerator(texture2d<float, access::write> outTexture [[texture
   float freq = uniforms.frequency;
   float lacunarity = uniforms.lacunarity;
   float persistance = uniforms.persistance;
-  float x = uniforms.pos.x + (float(gid.x)/float(threads.x));
-  float y = uniforms.pos.y + (float(gid.y)/float(threads.y));
+  float x = uniforms.pos.x + (float(gid.x)/float(threads.x)) + (grey(xoffset.read(gid)) * disStren);
+  float y = uniforms.pos.y + (float(gid.y)/float(threads.y)) + (grey(yoffset.read(gid)) * disStren);
   float z = uniforms.z;
+  float3 centre = float3(uniforms.pos.x + 0.5, uniforms.pos.y + 0.5, z);
+  float3 rot = rotatePoints(float3(x,y,z), uniforms.rotations, centre);
+  x = rot.x;
+  y = rot.y;
+  z = rot.z;
   float w = uniforms.w;
   
   if (sphereMap != 0){
     float pi = 3.14159265;
-    float xx = cos(pi*2*y)*sin(pi*x);
-    float yy = sin(pi*2*y)*sin(pi*x);
-    z = cos(pi*x);
+    float xx = cos(pi*2*x)*sin(pi*y);
+    float yy = sin(pi*2*x)*sin(pi*y);
+    z = cos(pi*y);
     x = xx;
     y = yy;
   }
@@ -438,6 +672,7 @@ kernel void billowGenerator(texture2d<float, access::write> outTexture [[texture
     y = ny;
     z = nz;
     w = nw;
+    freq /= pi;
   }
   
   for (int j = 0; j < octaves; ++j){
@@ -457,33 +692,43 @@ kernel void billowGenerator(texture2d<float, access::write> outTexture [[texture
   outTexture.write(float4(r,r,r,1),gid);
 }
 
-// MARK: - Ridged Multi Kernel
+
+
+// MARK:- Ridged Multi Kernel
 kernel void ridgedMultiGenerator(texture2d<float, access::write> outTexture [[texture(0)]],
-                                 constant SimplexInputs &uniforms [[buffer(0)]],
+                                 texture2d<float, access::read> xoffset [[texture(1)]],
+                                 texture2d<float, access::read> yoffset [[texture(2)]],
+                                 constant CoherentInputs &uniforms [[buffer(0)]],
                                  uint2 gid [[thread_position_in_grid]],
                                  uint2 threads [[threads_per_grid]])
 {
   float total = 0.0;
   float amplitude = 1.0;
   float maxAmplitude = 0.0;
+  float disStren = uniforms.offsetStrength;
   int use4D = uniforms.useFourD;
   int sphereMap = uniforms.sphereMap;
   int seamless = uniforms.seamless;
-
+  
   int octaves = uniforms.octaves;
   float freq = uniforms.frequency;
   float lacunarity = uniforms.lacunarity;
   float persistance = uniforms.persistance;
-  float x = uniforms.pos.x + (float(gid.x)/float(threads.x));
-  float y = uniforms.pos.y + (float(gid.y)/float(threads.y));
+  float x = uniforms.pos.x + (float(gid.x)/float(threads.x)) + (grey(xoffset.read(gid)) * disStren);
+  float y = uniforms.pos.y + (float(gid.y)/float(threads.y)) + (grey(yoffset.read(gid)) * disStren);
   float z = uniforms.z;
+  float3 centre = float3(uniforms.pos.x + 0.5, uniforms.pos.y + 0.5, z);
+  float3 rot = rotatePoints(float3(x,y,z), uniforms.rotations, centre);
+  x = rot.x;
+  y = rot.y;
+  z = rot.z;
   float w = uniforms.w;
   
   if (sphereMap != 0){
     float pi = 3.14159265;
-    float xx = cos(pi*2*y)*sin(pi*x);
-    float yy = sin(pi*2*y)*sin(pi*x);
-    z = cos(pi*x);
+    float xx = cos(pi*2*x)*sin(pi*y);
+    float yy = sin(pi*2*x)*sin(pi*y);
+    z = cos(pi*y);
     x = xx;
     y = yy;
   }
@@ -499,13 +744,14 @@ kernel void ridgedMultiGenerator(texture2d<float, access::write> outTexture [[te
     y = ny;
     z = nz;
     w = nw;
+    freq /= pi;
   }
   
   for (int j = 0; j < octaves; ++j){
     if (use4D == 0){
-      total += (-abs(simplex3D(x*freq,y*freq,z*freq))+1) * amplitude;
+      total += ((-abs(simplex3D(x*freq,y*freq,z*freq))*2)+1) * amplitude;
     }else{
-      total += (-abs(simplex4D(x*freq,y*freq,z*freq,w*freq))+1) * amplitude;
+      total += ((-abs(simplex4D(x*freq,y*freq,z*freq,w*freq))*2)+1) * amplitude;
     }
     
     freq *= lacunarity;
@@ -517,8 +763,15 @@ kernel void ridgedMultiGenerator(texture2d<float, access::write> outTexture [[te
   outTexture.write(float4(r,r,r,1),gid);
 }
 
-// MARK: - Uniform Output Kernel
+
+
+
+
+
+// MARK:- Uniform Output Kernel
 kernel void uniformGenerator(texture2d<float, access::write> outTexture [[texture(0)]],
+                             texture2d<float, access::read> xoffset [[texture(1)]],
+                             texture2d<float, access::read> yoffset [[texture(2)]],
                              constant float3 &uniforms [[buffer(0)]],
                              uint2 gid [[thread_position_in_grid]])
 {
@@ -526,13 +779,287 @@ kernel void uniformGenerator(texture2d<float, access::write> outTexture [[textur
 }
 
 
-// MARK: - Test Kernel
-kernel void test(constant SimplexInputs &uniforms [[buffer(0)]],
+
+
+
+
+// MARK:- Geometric Kernels
+struct GeometricInputs{
+  float offset;
+  float frequency;
+  float xPosition;
+  float yPosition;
+  float zValue;
+  float offsetStrength;
+  float3 rotations;
+};
+
+
+
+// MARK:- Cylinder Kernel
+kernel void cylinderGenerator(texture2d<float, access::write> outTexture [[texture(0)]],
+                              texture2d<float, access::read> xoffset [[texture(1)]],
+                              texture2d<float, access::read> yoffset [[texture(2)]],
+                              constant GeometricInputs &uniforms [[buffer(0)]],
+                              uint2 gid [[thread_position_in_grid]],
+                              uint2 threads [[threads_per_grid]])
+{
+  float delay = uniforms.offset;
+  float frequency = uniforms.frequency;
+  float xPos = uniforms.xPosition;
+  float yPos = uniforms.yPosition;
+  float disStren = uniforms.offsetStrength;
+  
+  float xFrac = float(gid.x) / float(threads.x);
+  float yFrac = float(gid.y) / float(threads.y);
+  float3 centre = float3(0.5, 0.5, uniforms.zValue);
+  float3 rot = rotatePoints(float3(xFrac,yFrac,0), uniforms.rotations, centre);
+  xFrac = rot.x;
+  yFrac = rot.y;
+
+  float dx = xPos - xFrac + (grey(xoffset.read(gid)) * disStren);
+  float dy = yPos - yFrac + (grey(yoffset.read(gid)) * disStren);
+  float4 out = float4(0,0,0,1);
+  float distSquared = (dx*dx) + (dy*dy);
+  
+  if (distSquared > (delay*delay)){
+    float o = (-cos((sqrt(distSquared)-delay) * frequency * 25)+1)/2;
+    out = float4(o,o,o,1);
+  }
+  
+  outTexture.write(out,gid);
+}
+
+
+// MARK:- Sphere Kernel
+kernel void sphereGenerator(texture2d<float, access::write> outTexture [[texture(0)]],
+                            texture2d<float, access::read> xoffset [[texture(1)]],
+                            texture2d<float, access::read> yoffset [[texture(2)]],
+                            constant GeometricInputs &uniforms [[buffer(0)]],
+                            uint2 gid [[thread_position_in_grid]],
+                            uint2 threads [[threads_per_grid]])
+{
+  float delay = uniforms.offset;
+  float frequency = uniforms.frequency;
+  float xPos = uniforms.xPosition;
+  float yPos = uniforms.yPosition;
+  float zPos = uniforms.zValue;
+  float disStren = uniforms.offsetStrength;
+
+  float xFrac = float(gid.x) / float(threads.x);
+  float yFrac = float(gid.y) / float(threads.y);
+  
+  float3 centre = float3(0.5, 0.5, 0.0);
+  float3 rot = rotatePoints(float3(xFrac,yFrac,zPos), uniforms.rotations, centre);
+  xFrac = rot.x;
+  yFrac = rot.y;
+  zPos = rot.z;
+
+  float dx = xPos - xFrac + (grey(xoffset.read(gid)) * disStren);
+  float dy = yPos - yFrac + (grey(yoffset.read(gid)) * disStren);
+  float4 out = float4(0,0,0,1);
+  float distSquared = (dx*dx) + (dy*dy) + (zPos*zPos);
+  
+  if (distSquared > (delay*delay)){
+    float o = (-cos((sqrt(distSquared)-delay) * frequency * 50)+1)/2;
+    out = float4(o,o,o,1);
+  }
+  
+  outTexture.write(out,gid);
+}
+
+
+// MARK:- Checker Kernel
+kernel void checkerGenerator(texture2d<float, access::write> outTexture [[texture(0)]],
+                             texture2d<float, access::read> xoffset [[texture(1)]],
+                             texture2d<float, access::read> yoffset [[texture(2)]],
+                             constant GeometricInputs &uniforms [[buffer(0)]],
+                             uint2 gid [[thread_position_in_grid]],
+                             uint2 threads [[threads_per_grid]])
+{
+  float frequency = uniforms.frequency*3;
+  float disStren = uniforms.offsetStrength;
+  float4 out = float4(0,0,0,1);
+  
+  float2 pos = float2(gid)/(float2(threads)/frequency);
+  float zPos = uniforms.zValue;
+  float3 centre = float3(frequency/2, frequency/2, 0.0);
+  float3 rot = rotatePoints(float3(pos.x,pos.y,zPos), uniforms.rotations, centre);
+  pos = float2(rot.x, rot.y);
+  pos.x += (grey(xoffset.read(gid)) * disStren);
+  pos.y += (grey(yoffset.read(gid)) * disStren);
+  zPos = rot.z;
+  int2 ipos = int2(floor(pos));
+  int c = int((abs(ipos.x)+abs(ipos.y)+int(zPos)) % 2 == 0);
+  out = float4(c,c,c,1);
+  
+  outTexture.write(out,gid);
+}
+
+
+
+
+struct GradientInputs{
+  float4 positions;
+  float offsetStrength;
+  float3 rotations;
+};
+
+
+// MARK:- Linear Gradient Generator
+kernel void linearGradientGenerator(texture2d<float, access::write> outTexture [[texture(0)]],
+                                    texture2d<float, access::read> xoffset [[texture(1)]],
+                                    texture2d<float, access::read> yoffset [[texture(2)]],
+                                    constant GradientInputs &uniforms [[buffer(0)]],
+                                    uint2 gid [[thread_position_in_grid]],
+                                    uint2 threads [[threads_per_grid]])
+{
+  float2 s = float2(uniforms.positions.x, uniforms.positions.y);
+  float2 e = float2(uniforms.positions.z, uniforms.positions.w);
+  float2 m = (e+s)/2;
+  
+  float2 p = float2(gid)/float2(threads);
+  float3 centre = float3(0.5, 0.5, 0);
+  float3 rot = rotatePoints(float3(p.x,p.y,0),uniforms.rotations, centre);
+  p.x = rot.x;
+  p.y = rot.y;
+
+  float disStren = uniforms.offsetStrength;
+  p.x += (grey(xoffset.read(gid)) * disStren);
+  p.y += (grey(yoffset.read(gid)) * disStren);
+
+  
+  float2 me = e-m;
+  float lme = length(me);
+  
+  float2 mp = p-m;
+  float lmp = length(mp);
+  
+  float angle = dot(me,mp)/(lmp*lme);
+  if (length(m - p) < 0.005){
+    angle = 0.5;
+  }else{
+    angle = (((angle*lmp)/length(e-s))+0.5);
+  }
+  
+  float4 out = float4(angle,angle,angle,1);
+  
+  outTexture.write(out,gid);
+}
+
+
+
+// MARK:- Radial Gradient Generator
+kernel void radialGradientGenerator(texture2d<float, access::write> outTexture [[texture(0)]],
+                                    texture2d<float, access::read> xoffset [[texture(1)]],
+                                    texture2d<float, access::read> yoffset [[texture(2)]],
+                                    constant GradientInputs &uniforms [[buffer(0)]],
+                                    uint2 gid [[thread_position_in_grid]],
+                                    uint2 threads [[threads_per_grid]])
+{
+  float2 s = float2(uniforms.positions.x, uniforms.positions.y);
+  float2 f = float2(uniforms.positions.z, uniforms.positions.w);
+  
+  float2 p = float2(gid)/float2(threads);
+  float3 centre = float3(0.5, 0.5, 0);
+  float3 rot = rotatePoints(float3(p.x,p.y,0),uniforms.rotations, centre);
+  p.x = rot.x;
+  p.y = rot.y;
+  
+  float disStren = uniforms.offsetStrength;
+  p.x += (grey(xoffset.read(gid)) * disStren);
+  p.y += (grey(yoffset.read(gid)) * disStren);
+  float2 d = p-s;
+  float2 weight = d*f*2;
+  
+  float o = 1-(length(weight));
+  
+  float4 out = float4(o,o,o,1);
+  
+  outTexture.write(out,gid);
+}
+
+
+
+// MARK:- Box Gradient Generator
+kernel void boxGradientGenerator(texture2d<float, access::write> outTexture [[texture(0)]],
+                                 texture2d<float, access::read> xoffset [[texture(1)]],
+                                 texture2d<float, access::read> yoffset [[texture(2)]],
+                                 constant GradientInputs &uniforms [[buffer(0)]],
+                                 uint2 gid [[thread_position_in_grid]],
+                                 uint2 threads [[threads_per_grid]])
+{
+  float2 f = float2(uniforms.positions.x, uniforms.positions.y);
+  
+  float o = 1.0;
+  if (f.x <= 0.99 || f.y <= 0.99){
+    float2 p = float2(gid)/float2(threads);
+    float3 centre = float3(0.5, 0.5, 0);
+    float3 rot = rotatePoints(float3(p.x,p.y,0),uniforms.rotations, centre);
+    p.x = rot.x;
+    p.y = rot.y;
+    
+    float disStren = uniforms.offsetStrength;
+    p.x += (grey(xoffset.read(gid)) * disStren);
+    p.y += (grey(yoffset.read(gid)) * disStren);
+    float2 c = 1-(abs(p-0.5)*2);
+    c = c/(1-f);
+    o = min(c.x,c.y);
+  }
+  
+  float4 out = float4(o,o,o,1);
+  
+  outTexture.write(out,gid);
+}
+
+
+
+struct WaveInputs {
+  float frequency;
+  float offsetStrength;
+  float3 rotations;
+};
+
+// MARK:- Wave Generator
+kernel void waveGenerator(texture2d<float, access::write> outTexture [[texture(0)]],
+                          texture2d<float, access::read> xoffset [[texture(1)]],
+                          texture2d<float, access::read> yoffset [[texture(2)]],
+                          constant WaveInputs &uniforms [[buffer(0)]],
+                          uint2 gid [[thread_position_in_grid]],
+                          uint2 threads [[threads_per_grid]])
+{
+  float freq = uniforms.frequency;
+  
+  float2 p = float2(gid)/float2(threads);
+  float3 centre = float3(0.5, 0.5, 0);
+  float3 rot = rotatePoints(float3(p.x,p.y,0),uniforms.rotations, centre);
+  p.x = rot.x;
+  p.y = rot.y;
+  
+  float disStren = uniforms.offsetStrength;
+  p.x += (grey(xoffset.read(gid)) * disStren);
+  p.y += (grey(yoffset.read(gid)) * disStren);
+  
+  float x = (p.x)*sin(0.0);
+  float y = (p.y)*cos(0.0);
+  float o = sin((x+y)*freq*8);
+  o = (o+1)/2;
+  
+  float4 out = float4(o,o,o,1);
+  
+  outTexture.write(out,gid);
+}
+
+
+
+
+// MARK:- Test Kernel
+kernel void test(constant CoherentInputs &uniforms [[buffer(0)]],
                  device float &outBuffer [[buffer(1)]],
                  uint2 gid [[threads_per_grid]],
                  uint2 gp [[thread_position_in_grid]])
 {
   
-    outBuffer = uniforms.sphereMap;
+  outBuffer = uniforms.sphereMap;
 }
 

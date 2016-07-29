@@ -12,7 +12,7 @@ import simd
 
 
 ///The struct used to encode user defined properties (uniforms) to the GPU.
-private struct LoopModifierUniforms {
+struct LoopModifierUniforms {
   var normalise: Bool
   var loopValue: Float
 }
@@ -21,58 +21,33 @@ private struct LoopModifierUniforms {
 /**
  Takes the outputs of any class that adheres to the `AHNTextureProvider` protocol and loops or wraps pixel values to never exceed a specified `loopValue` property.
  
- The output of the `AHNGenerator` classes returns value in the range -1.0 - 1.0 [0.0 - 1.0 in colour space], where a noise value exceed the `loopValue` property, the value will be looped back to zero. This looping can occur multiple times.
- 
- For example if a pixel has a value of 0.2 [0.6 in colour space] and the `loopValue` property is set to 0.5, the returned value will be -0.8 [0.1 in colour space].
- 
- The mathematics is carried out on the numbers in colour space, not noise space (0.0 - 1.0 not -1.0 - 1.0].
- 
- The output of this module will always be greyscale as the colour channels are averaged to grey during the calculations.
+ Values above the `boundary` are replaced with remainder from the result of dividing the value by the `boundary`.
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
 public class AHNModifierLoop: AHNModifier {
   
+  var allowableControls: [String] = ["boundary", "normalise"]
   
   // MARK:- Properties
   
   
-  ///The value to loop at (default is 0.5). No colour value will exceed this value (unless `normalise` is set to `true`.
-  private var loop: Float = 0.5
-  
-  
-  
-  ///If false (default), the output is within the range -1.0 - `((loopValue*2)-1)` [0.0 - `loopValue` in colour space], if true the output is remapped to cover the whole -1.0 - 1.0 range of the input [0.0 - 1.0 in colour space].
-  private var shouldNormalise: Bool = false
-  
-  
-  
-  ///The value to loop at (default is 0.5). No colour value will exceed this value (unless `normalise` is set to `true`.
-  public var loopValue: Float{
-    get{
-      return loop
-    }
-    set{
-      if newValue <= 0 || newValue > 1{
-        print("AHNoise: WARNING - Loop at a value less than 0 or greater than 1 will result in full black texture for 0 or no effect for >1. Currently \(newValue)")
-      }
-      loop = newValue
+  ///The value to loop at. No texture value will exceed this value (unless `normalise` is set to `true`). The default value is `0.5`.
+  public var boundary: Float = 0.5{
+    didSet{
       dirty = true
     }
   }
   
   
   
-  ///If false (default), the output is within the range -1.0 - `((loopValue*2)-1)` [0.0 - `loopValue` in colour space], if true the output is remapped to cover the whole -1.0 - 1.0 range of the input [0.0 - 1.0 in colour space].
-  public var normalise: Bool{
-    get{
-      return shouldNormalise
-    }
-    set{
-      shouldNormalise = newValue
+  ///If `false`, the output is within the range `0.0 - loopValue`, if `true` the output is remapped to cover the whole `0.0 - 1.0` range. The default value is `false`.
+  public var normalise: Bool = false{
+    didSet{
       dirty = true
     }
   }
+  
   
   
   
@@ -86,17 +61,10 @@ public class AHNModifierLoop: AHNModifier {
   
   
   // MARK:- Initialiser
+    
   
-  
-  /**
-   Creates a new `AHNModifierLoop` object.
-   
-   - parameter input: The input to perform the loop on.
-   - parameter loopEvery: The value to loop at.
-   */
-  public init(input: AHNTextureProvider, loopEvery loop: Float){
-    super.init(functionName: "loopModifier", input: input)
-    loopValue = loop
+  required public init(){
+    super.init(functionName: "loopModifier")
   }
   
   
@@ -111,14 +79,73 @@ public class AHNModifierLoop: AHNModifier {
   
   ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
   public override func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = LoopModifierUniforms(normalise: shouldNormalise, loopValue: loop)
+    var uniforms = LoopModifierUniforms(normalise: normalise, loopValue: boundary)
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(sizeof(LoopModifierUniforms), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.newBufferWithLength(strideof(LoopModifierUniforms), options: .CPUCacheModeDefaultCache)
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, sizeof(LoopModifierUniforms))
+    memcpy(uniformBuffer!.contents(), &uniforms, strideof(LoopModifierUniforms))
     
     commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  // MARK:- NSCoding
+  public func encodeWithCoder(aCoder: NSCoder) {
+    var mirror = Mirror(reflecting: self)
+    repeat{
+      for child in mirror.children{
+        if allowableControls.contains(child.label!){
+          if child.value is Int{
+            aCoder.encodeInteger(child.value as! Int, forKey: child.label!)
+          }
+          if child.value is Float{
+            aCoder.encodeFloat(child.value as! Float, forKey: child.label!)
+          }
+          if child.value is Bool{
+            aCoder.encodeBool(child.value as! Bool, forKey: child.label!)
+          }
+        }
+      }
+      mirror = mirror.superclassMirror()!
+    }while String(mirror.subjectType).hasPrefix("AHN")
+  }
+  
+  public required init?(coder aDecoder: NSCoder) {
+    super.init(functionName: "loopModifier")
+    var mirror = Mirror(reflecting: self.dynamicType.init())
+    repeat{
+      for child in mirror.children{
+        if allowableControls.contains(child.label!){
+          if child.value is Int{
+            let val = aDecoder.decodeIntegerForKey(child.label!)
+            setValue(val, forKey: child.label!)
+          }
+          if child.value is Float{
+            let val = aDecoder.decodeFloatForKey(child.label!)
+            setValue(val, forKey: child.label!)
+          }
+          if child.value is Bool{
+            let val = aDecoder.decodeBoolForKey(child.label!)
+            setValue(val, forKey: child.label!)
+          }
+        }
+      }
+      mirror = mirror.superclassMirror()!
+    }while String(mirror.subjectType).hasPrefix("AHN")
   }
 }

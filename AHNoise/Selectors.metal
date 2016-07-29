@@ -32,20 +32,21 @@ kernel void selectSelector(texture2d<float, access::read> inTexture1 [[texture(0
                            texture2d<float, access::read> inTexture2 [[texture(1)]],
                            texture2d<float, access::read> selector [[texture(2)]],
                            texture2d<float, access::write> outTexture [[texture(3)]],
-                           constant float &uniforms [[buffer(0)]],
+                           constant float2 &uniforms [[buffer(0)]],
                            uint2 gid [[thread_position_in_grid]])
 {
   float4 in1 = inTexture1.read(gid);
   float4 in2 = inTexture2.read(gid);
   float4 sel = selector.read(gid);
   float weight = (sel.r + sel.g + sel.b)/3;
-  float edge = uniforms;
-  float nedge = 0.5-(edge/2);
+  float edge = uniforms.x;
+  float bound = uniforms.y;
+  float nedge = bound-(edge/2);
   
   if (weight <= nedge){
     outTexture.write(in1, gid);
-  }else if (weight > nedge && weight <(1-nedge)){
-    float fac = (((edge/2)-0.5)+weight)/edge;
+  }else if (weight > nedge && weight <((bound*2)-nedge)){
+    float fac = (((edge/2)-bound)+weight)/edge;
     outTexture.write(float4(mix(in1.rgb, in2.rgb, fac),1),gid);
   }else{
     outTexture.write(in2, gid);

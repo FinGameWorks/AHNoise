@@ -11,13 +11,39 @@ import UIKit
 import Metal
 
 
+import UIKit
+import Metal
+
+
 /**
-A wrapper for the `MTLDevice`, `MTLLibrary` and `MTLCommandQueue` used to create the noise textures. Used when generating noise textures using an `AHNGenerator` subclass.
+ A wrapper for the `MTLDevice`, `MTLLibrary` and `MTLCommandQueue` used to create the noise textures. Used when generating noise textures using an `AHNGenerator` subclass.
  
- `AHNModifier`, `AHNCombiner` and `AHNSelector` require an `AHNContext` to run, but reference the same `AHNContext` object as their input. As an `AHNGenerator` has no input textures, an `AHNContext`
- object must be supplied on initialisation.
-*/
+ `AHNModifier`, `AHNCombiner` and `AHNSelector` require an `AHNContext` to run, but reference the same `AHNContext` object as their input, which comes from the `Shared Context` class property for `AHNGenerators`.
+ */
 public class AHNContext: NSObject {
+  
+  
+  // MARK:- Static Functions
+  
+  ///The shared `AHNContext` object that is used by all `AHNTextureProvider` objects to communicate with the GPU.
+  static var SharedContext: AHNContext! = AHNContext.CreateContext()
+  
+  
+  
+  ///Set the `MTLDevice` of the `SharedContect` object to a specific object. An `MTLDevice` is a representation of a GPU, so apps for macOS (OSX) will want to set the device to the most powerful graphics hardware available, and not automatically default to onboard graphics.
+  static func SetContextDevice(device: MTLDevice){
+    SharedContext = CreateContext(device)
+  }
+  
+  
+  
+  ///- returns: An `AHNContext` object with the specified `MTLDevice`. If no `MTLDevice` is specified then the default is obtained from `MTLCreateSystemDefaultDevice()`.
+  private static func CreateContext(device: MTLDevice? = MTLCreateSystemDefaultDevice()) -> AHNContext{
+    return AHNContext(device: device)
+  }
+  
+  
+  
   
   
   // MARK:- Properties
@@ -52,11 +78,11 @@ public class AHNContext: NSObject {
   /**
    Creates a new `AHNContext` object for use with `AHNoise` modules.
    
-   - parameter device: (Optional) The `MTLDevice` used throughout the `AHNoise` framework. If no `MTLDevice` is specified then the default is obtained from `MTLCreateSystemDefaultDevice()`.
-  */
-  public init(device: MTLDevice? = MTLCreateSystemDefaultDevice()) {
+   - parameter device: (Optional) The `MTLDevice` used throughout the `AHNoise` framework..
+   */
+  private init(device: MTLDevice?) {
     guard let device = device else{
-      fatalError("AHNoise: Error creating system default device.")
+      fatalError("AHNoise: Error creating MTLDevice).")
     }
     self.device = device
     

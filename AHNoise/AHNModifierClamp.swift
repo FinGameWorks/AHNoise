@@ -12,7 +12,7 @@ import simd
 
 
 ///The struct used to encode user defined properties (uniforms) to the GPU.
-private struct ClampModifierUniforms {
+struct ClampModifierUniforms {
   var normalise: Bool
   var clampValues: vector_float2
 }
@@ -21,63 +21,46 @@ private struct ClampModifierUniforms {
 /**
  Takes the outputs of any class that adheres to the `AHNTextureProvider` protocol and performs a `clamp()` function on the pixel values.
  
- The output of the `AHNGenerator` classes returns value in the range -1.0 - 1.0 [0.0 - 1.0 in colour space], this module will perform a clamp function on the input, reverting any values over a specified maximum value to that maximum value, and the same for any values less than a specified minimum value. If the `normalise` property is true (false by default) then the output values will be remapped to -1.0 - 1.0 [0.0 - 1.0 in colour space], essentially stretching the to fit the original range.
+ The output of the `AHNGenerator` classes returns value in the range `0.0 - 1.0`, this module will perform a clamp function on the input, reverting any values over a specified maximum value to that maximum value, and the same for any values less than a specified minimum value. If the `normalise` property is true (false by default) then the output values will be remapped to `0.0 - 1.0`, essentially stretching the to fit the original range.
  
- For example if a pixel has a value of 0.8 [0.9 in colour space] and the `maximum` property is set to 0.5 [0.75 in colour space], the returned value will be 0.5 [0.75 in colour space]. The same applies for a value less than the minimum value. 
+ For example if a pixel has a value of `0.9` and the `maximum` property is set to `0.75`, the returned value will be `0.75`. The same applies for a value less than the minimum value.
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
 public class AHNModifierClamp: AHNModifier {
   
+  var allowableControls: [String] = ["normalise", "minimum", "maximum"]
+
+  
   // MARK:- Properties
   
   
-  ///The minimum and maximum values to be clamped to, wrapped in a vector.
-  private var clampValues: vector_float2 = vector_float2(0,1)
-  
-  
-  
-  ///If false (default), the output is within the range 0.0 - 1.0 [0.5 - 1.0 in colour space], if true the output is remapped to cover the whole -1.0 - 1.0 range of the input [0.0 - 1.0 in colour space].
-  private var shouldNormalise: Bool = false
-  
-  
-  
-  ///If false (default), the output is within the range 0.0 - 1.0 [0.5 - 1.0 in colour space], if true the output is remapped to cover the whole -1.0 - 1.0 range of the input [0.0 - 1.0 in colour space].
-  public var normalise: Bool{
-    get{
-      return shouldNormalise
-    }
-    set{
-      shouldNormalise = newValue
+  ///If `false` (default), the output is within the range `minimum - maximum, if `true` the output is remapped to cover the whole `0.0 - 1.0` range of the input.
+  public var normalise: Bool = false{
+    didSet{
       dirty = true
     }
   }
   
   
   
-  ///The minimum value to clamp to (default is 0), if a value in a texture is less than this value, this value will be returned instead.
-  public var minimum: Float{
-    get{
-      return clampValues.x
-    }
-    set{
-      clampValues.x = newValue
+  ///The maximum value of the range to clamp to. Values larger than this will be written to the output as this value. The default value is `1.0`.
+  public var minimum: Float = 0{
+    didSet{
       dirty = true
     }
   }
   
   
   
-  ///The maximum value to clamp to (default is 1), if a value in a texture is more than this value, this value will be returned instead.
-  public var maximum: Float{
-    get{
-      return clampValues.y
-    }
-    set{
-      clampValues.y = newValue
+  ///The minimum value of the range to clamp to. Values smaller than this will be written to the output as this value. The default value is `0.0`.
+  public var maximum: Float = 1{
+    didSet{
       dirty = true
     }
   }
+  
+  
   
   
   
@@ -90,18 +73,10 @@ public class AHNModifierClamp: AHNModifier {
   
   
   // MARK:- Initialiser
-  /**
-  Creates a new `AHNModifierClamp` object.
   
-  - parameter input: The input to perform the `clamp()` modifier on.
-  - parameter min: The minimum value to clamp to.
-  - parameter max: The maximum value to clamp to.
-  */
-  public init(input: AHNTextureProvider, min: Float, max: Float){
-    assert(max>min, "Max value must be larger than min value")
-    super.init(functionName: "clampModifier", input: input)
-    minimum = min
-    maximum = max
+  
+  required public init(){
+    super.init(functionName: "clampModifier")
   }
 
   
@@ -121,14 +96,73 @@ public class AHNModifierClamp: AHNModifier {
   
   ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
   public override func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = ClampModifierUniforms(normalise: shouldNormalise, clampValues: clampValues)
+    var uniforms = ClampModifierUniforms(normalise: normalise, clampValues: vector_float2(minimum, maximum))
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(sizeof(ClampModifierUniforms), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.newBufferWithLength(strideof(ClampModifierUniforms), options: .CPUCacheModeDefaultCache)
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, sizeof(ClampModifierUniforms))
+    memcpy(uniformBuffer!.contents(), &uniforms, strideof(ClampModifierUniforms))
     
     commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  // MARK:- NSCoding
+  public func encodeWithCoder(aCoder: NSCoder) {
+    var mirror = Mirror(reflecting: self)
+    repeat{
+      for child in mirror.children{
+        if allowableControls.contains(child.label!){
+          if child.value is Int{
+            aCoder.encodeInteger(child.value as! Int, forKey: child.label!)
+          }
+          if child.value is Float{
+            aCoder.encodeFloat(child.value as! Float, forKey: child.label!)
+          }
+          if child.value is Bool{
+            aCoder.encodeBool(child.value as! Bool, forKey: child.label!)
+          }
+        }
+      }
+      mirror = mirror.superclassMirror()!
+    }while String(mirror.subjectType).hasPrefix("AHN")
+  }
+  
+  public required init?(coder aDecoder: NSCoder) {
+    super.init(functionName: "clampModifier")
+    var mirror = Mirror(reflecting: self.dynamicType.init())
+    repeat{
+      for child in mirror.children{
+        if allowableControls.contains(child.label!){
+          if child.value is Int{
+            let val = aDecoder.decodeIntegerForKey(child.label!)
+            setValue(val, forKey: child.label!)
+          }
+          if child.value is Float{
+            let val = aDecoder.decodeFloatForKey(child.label!)
+            setValue(val, forKey: child.label!)
+          }
+          if child.value is Bool{
+            let val = aDecoder.decodeBoolForKey(child.label!)
+            setValue(val, forKey: child.label!)
+          }
+        }
+      }
+      mirror = mirror.superclassMirror()!
+    }while String(mirror.subjectType).hasPrefix("AHN")
   }
 }

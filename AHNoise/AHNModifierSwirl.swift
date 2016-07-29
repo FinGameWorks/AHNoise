@@ -20,9 +20,9 @@ import simd
  
  Values are interpolated to avoid pixellation.
  
- The centre point about which the swirl takes place can be defined by the `xAnchor` and `yAnchor` properties. These can vary from `(0.0,0.0)` for the bottom left to `(1.0,1.0)` for the top right. The default is (0.5,0.5).
+ The centre point about which the swirl takes place can be defined by the `xAnchor` and `yAnchor` properties. These can vary from `(0.0,0.0)` for the bottom left to `(1.0,1.0)` for the top right. The default is (`0.5,0.5`).
  
- Where the rotation results in the canvas being partially empty, this can be either left blank by setting `cutEdges` to true, or filled in black if set to false.
+ Where the rotation results in the canvas being partially empty, this can be either left blank by setting `cutEdges` to `true`, or filled in black if set to `false`.
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
@@ -31,58 +31,42 @@ public class AHNModifierSwirl: AHNModifier {
   
   // MARK:- Properties
   
-  
-  ///The rotation intensity, anchor point and cut edges bool wrapped in a vector.
-  private var rotate: vector_float4 = vector_float4(0.5, 0.5, 0.5, 1)
-  
+  var allowableControls: [String] = ["xAnchor", "yAnchor", "intensity", "cutEdges"]
+
   
   
-  ///The anchor point for horizontal axis about which to swirl the input. Default is 0.5.
-  public var xAnchor: Float{
-    get{
-      return rotate.x
-    }
-    set{
-      rotate.x = newValue
+  
+  
+  ///The anchor point for horizontal axis about which to swirl the input. Default is `0.5`.
+  public var xAnchor: Float = 0.5{
+    didSet{
       dirty = true
     }
   }
   
   
   
-  ///The anchor point for vertical axis about which to swirl the input. Default is 0.5.
-  public var yAnchor: Float{
-    get{
-      return rotate.y
-    }
-    set{
-      rotate.y = newValue
+  ///The anchor point for vertical axis about which to swirl the input. Default is `0.5`.
+  public var yAnchor: Float = 0.5{
+    didSet{
       dirty = true
     }
   }
   
   
   
-  ///The intensity of the swirl. Default is 0.5.
-  public var intensity: Float{
-    get{
-      return rotate.z
-    }
-    set{
-      rotate.z = newValue
+  ///The intensity of the swirl. Default is `0.5`.
+  public var intensity: Float = 0.5{
+    didSet{
       dirty = true
     }
   }
   
   
   
-  ///When true, the edges of the input are "cut" before the swirl, meaning the black areas off the the canvas are not rotated and any area not covered by the input after rotation is clear. If false, these areas are filled black.
-  public var cutEdges: Bool{
-    get{
-      return rotate.w == 1 ? true : false
-    }
-    set{
-      rotate.w = newValue ? 1 : 0
+  ///When `true`, the edges of the input are "cut" before the swirl, meaning the black areas off the the canvas are not rotated and any area not covered by the input after rotation is clear. If `false`, these areas are filled black.
+  public var cutEdges: Bool = true{
+    didSet{
       dirty = true
     }
   }
@@ -104,15 +88,8 @@ public class AHNModifierSwirl: AHNModifier {
   // MARK:- Initialiser
   
   
-  /**
-   Creates a new `AHNModifierSwirl` object.
-   
-   - parameter input: The input to swirl.
-   - parameter radians: The intensity of the swirl.
-   */
-  public init(input: AHNTextureProvider, intensity: Float){
-    super.init(functionName: "swirlModifier", input: input)
-    self.intensity = intensity
+  required public init(){
+    super.init(functionName: "swirlModifier")
   }
   
   
@@ -126,14 +103,73 @@ public class AHNModifierSwirl: AHNModifier {
   
   ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
   public override func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = rotate
+    var uniforms = vector_float4(xAnchor, yAnchor, intensity, cutEdges ? 1 : 0)
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(sizeof(vector_float4), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.newBufferWithLength(strideof(vector_float4), options: .CPUCacheModeDefaultCache)
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, sizeof(vector_float4))
+    memcpy(uniformBuffer!.contents(), &uniforms, strideof(vector_float4))
     
     commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  // MARK:- NSCoding
+  public func encodeWithCoder(aCoder: NSCoder) {
+    var mirror = Mirror(reflecting: self)
+    repeat{
+      for child in mirror.children{
+        if allowableControls.contains(child.label!){
+          if child.value is Int{
+            aCoder.encodeInteger(child.value as! Int, forKey: child.label!)
+          }
+          if child.value is Float{
+            aCoder.encodeFloat(child.value as! Float, forKey: child.label!)
+          }
+          if child.value is Bool{
+            aCoder.encodeBool(child.value as! Bool, forKey: child.label!)
+          }
+        }
+      }
+      mirror = mirror.superclassMirror()!
+    }while String(mirror.subjectType).hasPrefix("AHN")
+  }
+  
+  public required init?(coder aDecoder: NSCoder) {
+    super.init(functionName: "swirlModifier")
+    var mirror = Mirror(reflecting: self.dynamicType.init())
+    repeat{
+      for child in mirror.children{
+        if allowableControls.contains(child.label!){
+          if child.value is Int{
+            let val = aDecoder.decodeIntegerForKey(child.label!)
+            setValue(val, forKey: child.label!)
+          }
+          if child.value is Float{
+            let val = aDecoder.decodeFloatForKey(child.label!)
+            setValue(val, forKey: child.label!)
+          }
+          if child.value is Bool{
+            let val = aDecoder.decodeBoolForKey(child.label!)
+            setValue(val, forKey: child.label!)
+          }
+        }
+      }
+      mirror = mirror.superclassMirror()!
+    }while String(mirror.subjectType).hasPrefix("AHN")
   }
 }

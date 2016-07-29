@@ -9,7 +9,7 @@
 #include <metal_stdlib>
 using namespace metal;
 
-// Absolute Modifier
+// MARK:- Absolute Modifier
 kernel void absoluteModifier(texture2d<float, access::read> inTexture [[texture(0)]],
                              texture2d<float, access::write> outTexture [[texture(1)]],
                              constant bool &uniforms [[buffer(0)]],
@@ -23,7 +23,7 @@ kernel void absoluteModifier(texture2d<float, access::read> inTexture [[texture(
   outTexture.write(float4(out,1), gid);
 }
 
-// Clamp Modifier
+// MARK:- Clamp Modifier
 struct ClampModifierUniforms {
   bool normalise;
   float2 clampValues;
@@ -54,13 +54,13 @@ kernel void clampModifier(texture2d<float, access::read> inTexture [[texture(0)]
     }
     in.rgb /= 2;
     in.rgb += 0.5;
-    
+    out = in.rgb;
   }
-  outTexture.write(float4(in.rgb,1), gid);
+  outTexture.write(float4(out,1), gid);
 }
 
 
-// Step Modifier
+// MARK:- Step Modifier
 kernel void stepModifier(texture2d<float, access::read> inTexture [[texture(0)]],
                          texture2d<float, access::write> outTexture [[texture(1)]],
                          constant float3 &uniforms [[buffer(0)]],
@@ -76,7 +76,7 @@ kernel void stepModifier(texture2d<float, access::read> inTexture [[texture(0)]]
   outTexture.write(float4(out,out,out,1), gid);
 }
 
-// Invert Modifier
+// MARK:- Invert Modifier
 kernel void invertModifier(texture2d<float, access::read> inTexture [[texture(0)]],
                            texture2d<float, access::write> outTexture [[texture(1)]],
                            uint2 gid [[thread_position_in_grid]])
@@ -86,7 +86,7 @@ kernel void invertModifier(texture2d<float, access::read> inTexture [[texture(0)
   outTexture.write(float4(out,1), gid);
 }
 
-// Scale Bias Modifier
+// MARK:- Scale Bias Modifier
 kernel void scaleBiasModifier(texture2d<float, access::read> inTexture [[texture(0)]],
                               texture2d<float, access::write> outTexture [[texture(1)]],
                               constant float2 &uniforms [[buffer(0)]],
@@ -97,7 +97,7 @@ kernel void scaleBiasModifier(texture2d<float, access::read> inTexture [[texture
   outTexture.write(float4(out,1), gid);
 }
 
-// Round Modifier
+// MARK:- Round Modifier
 kernel void roundModifier(texture2d<float, access::read> inTexture [[texture(0)]],
                           texture2d<float, access::write> outTexture [[texture(1)]],
                           constant float &uniforms [[buffer(0)]],
@@ -112,7 +112,7 @@ kernel void roundModifier(texture2d<float, access::read> inTexture [[texture(0)]
   outTexture.write(float4(out,1), gid);
 }
 
-// Loop Modifier
+// MARK:- Loop Modifier
 struct LoopModifierUniforms {
   bool normalise;
   float loopValue;
@@ -135,7 +135,7 @@ kernel void loopModifier(texture2d<float, access::read> inTexture [[texture(0)]]
   outTexture.write(float4(out,out,out,1), gid);
 }
 
-// Stretch Modifier
+// MARK:- Stretch Modifier
 kernel void stretchModifier(texture2d<float, access::read> inTexture [[texture(0)]],
                             texture2d<float, access::write> outTexture [[texture(1)]],
                             constant float4 &uniforms [[buffer(0)]],
@@ -179,7 +179,7 @@ kernel void stretchModifier(texture2d<float, access::read> inTexture [[texture(0
   outTexture.write(out, gid);
 }
 
-// Normal Map Modifier
+// MARK:- Normal Map Modifier - DEPRECATED! USES SPRITEKIT NOW
 struct NormalMapModifierUniforms {
   float intensity;
   int2 axes;
@@ -190,53 +190,7 @@ kernel void normalMapModifier(texture2d<float, access::read> inTexture [[texture
                               constant NormalMapModifierUniforms &uniforms [[buffer(0)]],
                               uint2 gid [[thread_position_in_grid]],
                               uint2 threads [[threads_per_grid]])
-{
-  uint x1 = gid.x == 0 ? gid.x : gid.x - 1;
-  uint y1 = gid.y == 0 ? gid.y : gid.y - 1;
-  uint x2 = gid.x == threads.x ? gid.x : gid.x + 1;
-  uint y2 = gid.y == threads.y ? gid.y : gid.y + 1;
-  
-  uint xRange = 2.0;
-  uint yRange = 2.0;
-  
-  if (gid.x == 0 || gid.x == threads.x){
-    xRange = 1;
-  }
-  if (gid.y == 0 || gid.y == threads.y){
-    yRange = 1;
-  }
-  
-  
-  float4 lowX4 = inTexture.read(uint2(x1, gid.y));
-  float4 highX4 = inTexture.read(uint2(x2, gid.y));
-  float4 lowY4 = inTexture.read(uint2(gid.x, y1));
-  float4 highY4 = inTexture.read(uint2(gid.x, y2));
-  
-  float intensity = uniforms.intensity;
-
-  float lowX = ((lowX4.r + lowX4.g + lowX4.b)/3) * intensity;
-  float highX = ((highX4.r + highX4.g + highX4.b)/3) * intensity;
-  float lowY = ((lowY4.r + lowY4.g + lowY4.b)/3) * intensity;
-  float highY = ((highY4.r + highY4.g + highY4.b)/3) * intensity;
-  
-  float dx = ((highX - lowX)/xRange);
-  float dy = ((highY - lowY)/yRange);
-  
-  int2 axisFlip = uniforms.axes;
-  
-  if (axisFlip.x != 0){
-    dx *= -1;
-  }
-  if (axisFlip.y != 0){
-    dy *= -1;
-  }
-  
-  
-  float3 out = float3(dx+0.5, dy+0.5, 1);
-  out = normalize(out);
-
-  outTexture.write(float4(out,1), gid);
-}
+{}
 
 
 
@@ -244,7 +198,7 @@ kernel void normalMapModifier(texture2d<float, access::read> inTexture [[texture
 
 
 
-// Colour Modifier
+// MARK:- MARK:- Colour Modifier
 kernel void colourModifier(texture2d<float, access::read> inTexture [[texture(0)]],
                             texture2d<float, access::write> outTexture [[texture(1)]],
                             const device float4 *uniforms [[buffer(0)]],
@@ -290,7 +244,7 @@ kernel void colourModifier(texture2d<float, access::read> inTexture [[texture(0)
   outTexture.write(out, gid);
 }
 
-// Rotate Modifier
+// MARK:- Rotate Modifier
 kernel void rotateModifier(texture2d<float, access::read> inTexture [[texture(0)]],
                             texture2d<float, access::write> outTexture [[texture(1)]],
                             constant float4 &uniforms [[buffer(0)]],
@@ -334,7 +288,7 @@ kernel void rotateModifier(texture2d<float, access::read> inTexture [[texture(0)
   outTexture.write(out, gid);
 }
 
-// Swirl Modifier
+// MARK:- Swirl Modifier
 kernel void swirlModifier(texture2d<float, access::read> inTexture [[texture(0)]],
                            texture2d<float, access::write> outTexture [[texture(1)]],
                            constant float4 &uniforms [[buffer(0)]],
@@ -381,7 +335,7 @@ kernel void swirlModifier(texture2d<float, access::read> inTexture [[texture(0)]
   outTexture.write(out, gid);
 }
 
-// Perspective Modifier
+// MARK:- Perspective Modifier
 kernel void perspectiveModifier(texture2d<float, access::read> inTexture [[texture(0)]],
                           texture2d<float, access::write> outTexture [[texture(1)]],
                           constant float3 &uniforms [[buffer(0)]],
@@ -431,7 +385,7 @@ struct ScaleCanvasProperties{
   uint4 oldSize;
 };
 
-// ScaleCanvas Modifier
+// MARK:- ScaleCanvas Modifier
 kernel void scaleCanvasModifier(texture2d<float, access::read> inTexture [[texture(0)]],
                                 texture2d<float, access::write> outTexture [[texture(1)]],
                                 constant ScaleCanvasProperties &uniforms [[buffer(0)]],

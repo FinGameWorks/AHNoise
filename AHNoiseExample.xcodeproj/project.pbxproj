@@ -12,46 +12,55 @@
 		960494DD1D00778E009B4F6D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 960494DB1D00778E009B4F6D /* Main.storyboard */; };
 		960494DF1D00778E009B4F6D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 960494DE1D00778E009B4F6D /* Assets.xcassets */; };
 		960494E21D00778E009B4F6D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 960494E01D00778E009B4F6D /* LaunchScreen.storyboard */; };
-		96275B1A1D00AC9F004BAB53 /* AHNCombiner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275AF31D00AC9F004BAB53 /* AHNCombiner.swift */; };
-		96275B1B1D00AC9F004BAB53 /* AHNCombinerAdd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275AF41D00AC9F004BAB53 /* AHNCombinerAdd.swift */; };
-		96275B1C1D00AC9F004BAB53 /* AHNCombinerDivide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275AF51D00AC9F004BAB53 /* AHNCombinerDivide.swift */; };
-		96275B1D1D00AC9F004BAB53 /* AHNCombinerMax.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275AF61D00AC9F004BAB53 /* AHNCombinerMax.swift */; };
-		96275B1E1D00AC9F004BAB53 /* AHNCombinerMin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275AF71D00AC9F004BAB53 /* AHNCombinerMin.swift */; };
-		96275B1F1D00AC9F004BAB53 /* AHNCombinerMultiply.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275AF81D00AC9F004BAB53 /* AHNCombinerMultiply.swift */; };
-		96275B201D00AC9F004BAB53 /* AHNCombinerPower.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275AF91D00AC9F004BAB53 /* AHNCombinerPower.swift */; };
-		96275B211D00AC9F004BAB53 /* AHNCombinerSubtract.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275AFA1D00AC9F004BAB53 /* AHNCombinerSubtract.swift */; };
-		96275B221D00AC9F004BAB53 /* AHNContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275AFB1D00AC9F004BAB53 /* AHNContext.swift */; };
-		96275B231D00AC9F004BAB53 /* AHNGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275AFC1D00AC9F004BAB53 /* AHNGenerator.swift */; };
-		96275B241D00AC9F004BAB53 /* AHNGeneratorBillow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275AFD1D00AC9F004BAB53 /* AHNGeneratorBillow.swift */; };
-		96275B251D00AC9F004BAB53 /* AHNGeneratorConstant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275AFE1D00AC9F004BAB53 /* AHNGeneratorConstant.swift */; };
-		96275B261D00AC9F004BAB53 /* AHNGeneratorRidgedMulti.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275AFF1D00AC9F004BAB53 /* AHNGeneratorRidgedMulti.swift */; };
-		96275B271D00AC9F004BAB53 /* AHNGeneratorSimplex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B001D00AC9F004BAB53 /* AHNGeneratorSimplex.swift */; };
-		96275B281D00AC9F004BAB53 /* AHNModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B011D00AC9F004BAB53 /* AHNModifier.swift */; };
-		96275B291D00AC9F004BAB53 /* AHNModifierAbsolute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B021D00AC9F004BAB53 /* AHNModifierAbsolute.swift */; };
-		96275B2A1D00AC9F004BAB53 /* AHNModifierBlur.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B031D00AC9F004BAB53 /* AHNModifierBlur.swift */; };
-		96275B2B1D00AC9F004BAB53 /* AHNModifierClamp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B041D00AC9F004BAB53 /* AHNModifierClamp.swift */; };
-		96275B2C1D00AC9F004BAB53 /* AHNModifierColour.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B051D00AC9F004BAB53 /* AHNModifierColour.swift */; };
-		96275B2D1D00AC9F004BAB53 /* AHNModifierInvert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B061D00AC9F004BAB53 /* AHNModifierInvert.swift */; };
-		96275B2E1D00AC9F004BAB53 /* AHNModifierLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B071D00AC9F004BAB53 /* AHNModifierLoop.swift */; };
-		96275B2F1D00AC9F004BAB53 /* AHNModifierNormalMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B081D00AC9F004BAB53 /* AHNModifierNormalMap.swift */; };
-		96275B301D00AC9F004BAB53 /* AHNModifierPerspective.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B091D00AC9F004BAB53 /* AHNModifierPerspective.swift */; };
-		96275B311D00AC9F004BAB53 /* AHNModifierRotate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B0A1D00AC9F004BAB53 /* AHNModifierRotate.swift */; };
-		96275B321D00AC9F004BAB53 /* AHNModifierRound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B0B1D00AC9F004BAB53 /* AHNModifierRound.swift */; };
-		96275B331D00AC9F004BAB53 /* AHNModifierScaleBias.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B0C1D00AC9F004BAB53 /* AHNModifierScaleBias.swift */; };
-		96275B341D00AC9F004BAB53 /* AHNModifierScaleCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B0D1D00AC9F004BAB53 /* AHNModifierScaleCanvas.swift */; };
-		96275B351D00AC9F004BAB53 /* AHNModifierStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B0E1D00AC9F004BAB53 /* AHNModifierStep.swift */; };
-		96275B361D00AC9F004BAB53 /* AHNModifierStretch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B0F1D00AC9F004BAB53 /* AHNModifierStretch.swift */; };
-		96275B371D00AC9F004BAB53 /* AHNModifierSwirl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B101D00AC9F004BAB53 /* AHNModifierSwirl.swift */; };
-		96275B381D00AC9F004BAB53 /* AHNSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B111D00AC9F004BAB53 /* AHNSelector.swift */; };
-		96275B391D00AC9F004BAB53 /* AHNSelectorBlend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B121D00AC9F004BAB53 /* AHNSelectorBlend.swift */; };
-		96275B3A1D00AC9F004BAB53 /* AHNSelectorSelect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B131D00AC9F004BAB53 /* AHNSelectorSelect.swift */; };
-		96275B3B1D00AC9F004BAB53 /* Combiners.metal in Sources */ = {isa = PBXBuildFile; fileRef = 96275B141D00AC9F004BAB53 /* Combiners.metal */; };
-		96275B3C1D00AC9F004BAB53 /* Generators.metal in Sources */ = {isa = PBXBuildFile; fileRef = 96275B151D00AC9F004BAB53 /* Generators.metal */; };
-		96275B3D1D00AC9F004BAB53 /* Modifiers.metal in Sources */ = {isa = PBXBuildFile; fileRef = 96275B161D00AC9F004BAB53 /* Modifiers.metal */; };
-		96275B3E1D00AC9F004BAB53 /* Selectors.metal in Sources */ = {isa = PBXBuildFile; fileRef = 96275B171D00AC9F004BAB53 /* Selectors.metal */; };
-		96275B3F1D00AC9F004BAB53 /* UIImage+AHNoise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B181D00AC9F004BAB53 /* UIImage+AHNoise.swift */; };
-		96275B411D00AD56004BAB53 /* AHNTextureProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96275B401D00AD56004BAB53 /* AHNTextureProvider.swift */; };
 		96275B431D01BBA8004BAB53 /* Licence in Resources */ = {isa = PBXBuildFile; fileRef = 96275B421D01BBA8004BAB53 /* Licence */; };
+		96756D391D4B70A300A51F68 /* AHNCombiner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D091D4B70A300A51F68 /* AHNCombiner.swift */; };
+		96756D3A1D4B70A300A51F68 /* AHNCombinerAdd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D0A1D4B70A300A51F68 /* AHNCombinerAdd.swift */; };
+		96756D3B1D4B70A300A51F68 /* AHNCombinerDivide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D0B1D4B70A300A51F68 /* AHNCombinerDivide.swift */; };
+		96756D3C1D4B70A300A51F68 /* AHNCombinerMax.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D0C1D4B70A300A51F68 /* AHNCombinerMax.swift */; };
+		96756D3D1D4B70A300A51F68 /* AHNCombinerMin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D0D1D4B70A300A51F68 /* AHNCombinerMin.swift */; };
+		96756D3E1D4B70A300A51F68 /* AHNCombinerMultiply.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D0E1D4B70A300A51F68 /* AHNCombinerMultiply.swift */; };
+		96756D3F1D4B70A300A51F68 /* AHNCombinerPower.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D0F1D4B70A300A51F68 /* AHNCombinerPower.swift */; };
+		96756D401D4B70A300A51F68 /* AHNCombinerSubtract.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D101D4B70A300A51F68 /* AHNCombinerSubtract.swift */; };
+		96756D411D4B70A300A51F68 /* AHNContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D111D4B70A300A51F68 /* AHNContext.swift */; };
+		96756D421D4B70A300A51F68 /* AHNGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D121D4B70A300A51F68 /* AHNGenerator.swift */; };
+		96756D431D4B70A300A51F68 /* AHNGeneratorBillow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D131D4B70A300A51F68 /* AHNGeneratorBillow.swift */; };
+		96756D441D4B70A300A51F68 /* AHNGeneratorChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D141D4B70A300A51F68 /* AHNGeneratorChecker.swift */; };
+		96756D451D4B70A300A51F68 /* AHNGeneratorCoherent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D151D4B70A300A51F68 /* AHNGeneratorCoherent.swift */; };
+		96756D461D4B70A300A51F68 /* AHNGeneratorConstant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D161D4B70A300A51F68 /* AHNGeneratorConstant.swift */; };
+		96756D471D4B70A300A51F68 /* AHNGeneratorCylinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D171D4B70A300A51F68 /* AHNGeneratorCylinder.swift */; };
+		96756D481D4B70A300A51F68 /* AHNGeneratorGradientBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D181D4B70A300A51F68 /* AHNGeneratorGradientBox.swift */; };
+		96756D491D4B70A300A51F68 /* AHNGeneratorGradientLinear.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D191D4B70A300A51F68 /* AHNGeneratorGradientLinear.swift */; };
+		96756D4A1D4B70A300A51F68 /* AHNGeneratorGradientRadial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D1A1D4B70A300A51F68 /* AHNGeneratorGradientRadial.swift */; };
+		96756D4B1D4B70A300A51F68 /* AHNGeneratorRidgedMulti.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D1B1D4B70A300A51F68 /* AHNGeneratorRidgedMulti.swift */; };
+		96756D4C1D4B70A300A51F68 /* AHNGeneratorSimplex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D1C1D4B70A300A51F68 /* AHNGeneratorSimplex.swift */; };
+		96756D4D1D4B70A300A51F68 /* AHNGeneratorSphere.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D1D1D4B70A300A51F68 /* AHNGeneratorSphere.swift */; };
+		96756D4E1D4B70A300A51F68 /* AHNGeneratorVoronoi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D1E1D4B70A300A51F68 /* AHNGeneratorVoronoi.swift */; };
+		96756D4F1D4B70A300A51F68 /* AHNGeneratorWave.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D1F1D4B70A300A51F68 /* AHNGeneratorWave.swift */; };
+		96756D501D4B70A300A51F68 /* AHNModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D201D4B70A300A51F68 /* AHNModifier.swift */; };
+		96756D511D4B70A300A51F68 /* AHNModifierAbsolute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D211D4B70A300A51F68 /* AHNModifierAbsolute.swift */; };
+		96756D521D4B70A300A51F68 /* AHNModifierBlur.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D221D4B70A300A51F68 /* AHNModifierBlur.swift */; };
+		96756D531D4B70A300A51F68 /* AHNModifierClamp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D231D4B70A300A51F68 /* AHNModifierClamp.swift */; };
+		96756D541D4B70A300A51F68 /* AHNModifierColour.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D241D4B70A300A51F68 /* AHNModifierColour.swift */; };
+		96756D551D4B70A300A51F68 /* AHNModifierInvert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D251D4B70A300A51F68 /* AHNModifierInvert.swift */; };
+		96756D561D4B70A300A51F68 /* AHNModifierLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D261D4B70A300A51F68 /* AHNModifierLoop.swift */; };
+		96756D571D4B70A300A51F68 /* AHNModifierMapNormal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D271D4B70A300A51F68 /* AHNModifierMapNormal.swift */; };
+		96756D581D4B70A300A51F68 /* AHNModifierPerspective.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D281D4B70A300A51F68 /* AHNModifierPerspective.swift */; };
+		96756D591D4B70A300A51F68 /* AHNModifierRotate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D291D4B70A300A51F68 /* AHNModifierRotate.swift */; };
+		96756D5A1D4B70A300A51F68 /* AHNModifierRound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D2A1D4B70A300A51F68 /* AHNModifierRound.swift */; };
+		96756D5B1D4B70A300A51F68 /* AHNModifierScaleBias.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D2B1D4B70A300A51F68 /* AHNModifierScaleBias.swift */; };
+		96756D5C1D4B70A300A51F68 /* AHNModifierScaleCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D2C1D4B70A300A51F68 /* AHNModifierScaleCanvas.swift */; };
+		96756D5D1D4B70A300A51F68 /* AHNModifierStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D2D1D4B70A300A51F68 /* AHNModifierStep.swift */; };
+		96756D5E1D4B70A300A51F68 /* AHNModifierStretch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D2E1D4B70A300A51F68 /* AHNModifierStretch.swift */; };
+		96756D5F1D4B70A300A51F68 /* AHNModifierSwirl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D2F1D4B70A300A51F68 /* AHNModifierSwirl.swift */; };
+		96756D601D4B70A300A51F68 /* AHNSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D301D4B70A300A51F68 /* AHNSelector.swift */; };
+		96756D611D4B70A300A51F68 /* AHNSelectorBlend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D311D4B70A300A51F68 /* AHNSelectorBlend.swift */; };
+		96756D621D4B70A300A51F68 /* AHNSelectorSelect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D321D4B70A300A51F68 /* AHNSelectorSelect.swift */; };
+		96756D631D4B70A300A51F68 /* AHNTextureProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D331D4B70A300A51F68 /* AHNTextureProvider.swift */; };
+		96756D641D4B70A300A51F68 /* Combiners.metal in Sources */ = {isa = PBXBuildFile; fileRef = 96756D341D4B70A300A51F68 /* Combiners.metal */; };
+		96756D651D4B70A300A51F68 /* Generators.metal in Sources */ = {isa = PBXBuildFile; fileRef = 96756D351D4B70A300A51F68 /* Generators.metal */; };
+		96756D661D4B70A300A51F68 /* Modifiers.metal in Sources */ = {isa = PBXBuildFile; fileRef = 96756D361D4B70A300A51F68 /* Modifiers.metal */; };
+		96756D671D4B70A300A51F68 /* Selectors.metal in Sources */ = {isa = PBXBuildFile; fileRef = 96756D371D4B70A300A51F68 /* Selectors.metal */; };
+		96756D681D4B70A300A51F68 /* UIImage+AHNoise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D381D4B70A300A51F68 /* UIImage+AHNoise.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,46 +71,55 @@
 		960494DE1D00778E009B4F6D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		960494E11D00778E009B4F6D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		960494E31D00778E009B4F6D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		96275AF31D00AC9F004BAB53 /* AHNCombiner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNCombiner.swift; path = AHNoise/AHNCombiner.swift; sourceTree = SOURCE_ROOT; };
-		96275AF41D00AC9F004BAB53 /* AHNCombinerAdd.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNCombinerAdd.swift; path = AHNoise/AHNCombinerAdd.swift; sourceTree = SOURCE_ROOT; };
-		96275AF51D00AC9F004BAB53 /* AHNCombinerDivide.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNCombinerDivide.swift; path = AHNoise/AHNCombinerDivide.swift; sourceTree = SOURCE_ROOT; };
-		96275AF61D00AC9F004BAB53 /* AHNCombinerMax.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNCombinerMax.swift; path = AHNoise/AHNCombinerMax.swift; sourceTree = SOURCE_ROOT; };
-		96275AF71D00AC9F004BAB53 /* AHNCombinerMin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNCombinerMin.swift; path = AHNoise/AHNCombinerMin.swift; sourceTree = SOURCE_ROOT; };
-		96275AF81D00AC9F004BAB53 /* AHNCombinerMultiply.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNCombinerMultiply.swift; path = AHNoise/AHNCombinerMultiply.swift; sourceTree = SOURCE_ROOT; };
-		96275AF91D00AC9F004BAB53 /* AHNCombinerPower.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNCombinerPower.swift; path = AHNoise/AHNCombinerPower.swift; sourceTree = SOURCE_ROOT; };
-		96275AFA1D00AC9F004BAB53 /* AHNCombinerSubtract.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNCombinerSubtract.swift; path = AHNoise/AHNCombinerSubtract.swift; sourceTree = SOURCE_ROOT; };
-		96275AFB1D00AC9F004BAB53 /* AHNContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNContext.swift; path = AHNoise/AHNContext.swift; sourceTree = SOURCE_ROOT; };
-		96275AFC1D00AC9F004BAB53 /* AHNGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGenerator.swift; path = AHNoise/AHNGenerator.swift; sourceTree = SOURCE_ROOT; };
-		96275AFD1D00AC9F004BAB53 /* AHNGeneratorBillow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGeneratorBillow.swift; path = AHNoise/AHNGeneratorBillow.swift; sourceTree = SOURCE_ROOT; };
-		96275AFE1D00AC9F004BAB53 /* AHNGeneratorConstant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGeneratorConstant.swift; path = AHNoise/AHNGeneratorConstant.swift; sourceTree = SOURCE_ROOT; };
-		96275AFF1D00AC9F004BAB53 /* AHNGeneratorRidgedMulti.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGeneratorRidgedMulti.swift; path = AHNoise/AHNGeneratorRidgedMulti.swift; sourceTree = SOURCE_ROOT; };
-		96275B001D00AC9F004BAB53 /* AHNGeneratorSimplex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGeneratorSimplex.swift; path = AHNoise/AHNGeneratorSimplex.swift; sourceTree = SOURCE_ROOT; };
-		96275B011D00AC9F004BAB53 /* AHNModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifier.swift; path = AHNoise/AHNModifier.swift; sourceTree = SOURCE_ROOT; };
-		96275B021D00AC9F004BAB53 /* AHNModifierAbsolute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierAbsolute.swift; path = AHNoise/AHNModifierAbsolute.swift; sourceTree = SOURCE_ROOT; };
-		96275B031D00AC9F004BAB53 /* AHNModifierBlur.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierBlur.swift; path = AHNoise/AHNModifierBlur.swift; sourceTree = SOURCE_ROOT; };
-		96275B041D00AC9F004BAB53 /* AHNModifierClamp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierClamp.swift; path = AHNoise/AHNModifierClamp.swift; sourceTree = SOURCE_ROOT; };
-		96275B051D00AC9F004BAB53 /* AHNModifierColour.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierColour.swift; path = AHNoise/AHNModifierColour.swift; sourceTree = SOURCE_ROOT; };
-		96275B061D00AC9F004BAB53 /* AHNModifierInvert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierInvert.swift; path = AHNoise/AHNModifierInvert.swift; sourceTree = SOURCE_ROOT; };
-		96275B071D00AC9F004BAB53 /* AHNModifierLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierLoop.swift; path = AHNoise/AHNModifierLoop.swift; sourceTree = SOURCE_ROOT; };
-		96275B081D00AC9F004BAB53 /* AHNModifierNormalMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierNormalMap.swift; path = AHNoise/AHNModifierNormalMap.swift; sourceTree = SOURCE_ROOT; };
-		96275B091D00AC9F004BAB53 /* AHNModifierPerspective.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierPerspective.swift; path = AHNoise/AHNModifierPerspective.swift; sourceTree = SOURCE_ROOT; };
-		96275B0A1D00AC9F004BAB53 /* AHNModifierRotate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierRotate.swift; path = AHNoise/AHNModifierRotate.swift; sourceTree = SOURCE_ROOT; };
-		96275B0B1D00AC9F004BAB53 /* AHNModifierRound.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierRound.swift; path = AHNoise/AHNModifierRound.swift; sourceTree = SOURCE_ROOT; };
-		96275B0C1D00AC9F004BAB53 /* AHNModifierScaleBias.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierScaleBias.swift; path = AHNoise/AHNModifierScaleBias.swift; sourceTree = SOURCE_ROOT; };
-		96275B0D1D00AC9F004BAB53 /* AHNModifierScaleCanvas.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierScaleCanvas.swift; path = AHNoise/AHNModifierScaleCanvas.swift; sourceTree = SOURCE_ROOT; };
-		96275B0E1D00AC9F004BAB53 /* AHNModifierStep.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierStep.swift; path = AHNoise/AHNModifierStep.swift; sourceTree = SOURCE_ROOT; };
-		96275B0F1D00AC9F004BAB53 /* AHNModifierStretch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierStretch.swift; path = AHNoise/AHNModifierStretch.swift; sourceTree = SOURCE_ROOT; };
-		96275B101D00AC9F004BAB53 /* AHNModifierSwirl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierSwirl.swift; path = AHNoise/AHNModifierSwirl.swift; sourceTree = SOURCE_ROOT; };
-		96275B111D00AC9F004BAB53 /* AHNSelector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNSelector.swift; path = AHNoise/AHNSelector.swift; sourceTree = SOURCE_ROOT; };
-		96275B121D00AC9F004BAB53 /* AHNSelectorBlend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNSelectorBlend.swift; path = AHNoise/AHNSelectorBlend.swift; sourceTree = SOURCE_ROOT; };
-		96275B131D00AC9F004BAB53 /* AHNSelectorSelect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNSelectorSelect.swift; path = AHNoise/AHNSelectorSelect.swift; sourceTree = SOURCE_ROOT; };
-		96275B141D00AC9F004BAB53 /* Combiners.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Combiners.metal; path = AHNoise/Combiners.metal; sourceTree = SOURCE_ROOT; };
-		96275B151D00AC9F004BAB53 /* Generators.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Generators.metal; path = AHNoise/Generators.metal; sourceTree = SOURCE_ROOT; };
-		96275B161D00AC9F004BAB53 /* Modifiers.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Modifiers.metal; path = AHNoise/Modifiers.metal; sourceTree = SOURCE_ROOT; };
-		96275B171D00AC9F004BAB53 /* Selectors.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Selectors.metal; path = AHNoise/Selectors.metal; sourceTree = SOURCE_ROOT; };
-		96275B181D00AC9F004BAB53 /* UIImage+AHNoise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "UIImage+AHNoise.swift"; path = "AHNoise/UIImage+AHNoise.swift"; sourceTree = SOURCE_ROOT; };
-		96275B401D00AD56004BAB53 /* AHNTextureProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNTextureProvider.swift; path = AHNoise/AHNTextureProvider.swift; sourceTree = SOURCE_ROOT; };
 		96275B421D01BBA8004BAB53 /* Licence */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Licence; sourceTree = "<group>"; };
+		96756D091D4B70A300A51F68 /* AHNCombiner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNCombiner.swift; path = AHNoise/AHNCombiner.swift; sourceTree = SOURCE_ROOT; };
+		96756D0A1D4B70A300A51F68 /* AHNCombinerAdd.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNCombinerAdd.swift; path = AHNoise/AHNCombinerAdd.swift; sourceTree = SOURCE_ROOT; };
+		96756D0B1D4B70A300A51F68 /* AHNCombinerDivide.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNCombinerDivide.swift; path = AHNoise/AHNCombinerDivide.swift; sourceTree = SOURCE_ROOT; };
+		96756D0C1D4B70A300A51F68 /* AHNCombinerMax.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNCombinerMax.swift; path = AHNoise/AHNCombinerMax.swift; sourceTree = SOURCE_ROOT; };
+		96756D0D1D4B70A300A51F68 /* AHNCombinerMin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNCombinerMin.swift; path = AHNoise/AHNCombinerMin.swift; sourceTree = SOURCE_ROOT; };
+		96756D0E1D4B70A300A51F68 /* AHNCombinerMultiply.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNCombinerMultiply.swift; path = AHNoise/AHNCombinerMultiply.swift; sourceTree = SOURCE_ROOT; };
+		96756D0F1D4B70A300A51F68 /* AHNCombinerPower.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNCombinerPower.swift; path = AHNoise/AHNCombinerPower.swift; sourceTree = SOURCE_ROOT; };
+		96756D101D4B70A300A51F68 /* AHNCombinerSubtract.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNCombinerSubtract.swift; path = AHNoise/AHNCombinerSubtract.swift; sourceTree = SOURCE_ROOT; };
+		96756D111D4B70A300A51F68 /* AHNContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNContext.swift; path = AHNoise/AHNContext.swift; sourceTree = SOURCE_ROOT; };
+		96756D121D4B70A300A51F68 /* AHNGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGenerator.swift; path = AHNoise/AHNGenerator.swift; sourceTree = SOURCE_ROOT; };
+		96756D131D4B70A300A51F68 /* AHNGeneratorBillow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGeneratorBillow.swift; path = AHNoise/AHNGeneratorBillow.swift; sourceTree = SOURCE_ROOT; };
+		96756D141D4B70A300A51F68 /* AHNGeneratorChecker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGeneratorChecker.swift; path = AHNoise/AHNGeneratorChecker.swift; sourceTree = SOURCE_ROOT; };
+		96756D151D4B70A300A51F68 /* AHNGeneratorCoherent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGeneratorCoherent.swift; path = AHNoise/AHNGeneratorCoherent.swift; sourceTree = SOURCE_ROOT; };
+		96756D161D4B70A300A51F68 /* AHNGeneratorConstant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGeneratorConstant.swift; path = AHNoise/AHNGeneratorConstant.swift; sourceTree = SOURCE_ROOT; };
+		96756D171D4B70A300A51F68 /* AHNGeneratorCylinder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGeneratorCylinder.swift; path = AHNoise/AHNGeneratorCylinder.swift; sourceTree = SOURCE_ROOT; };
+		96756D181D4B70A300A51F68 /* AHNGeneratorGradientBox.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGeneratorGradientBox.swift; path = AHNoise/AHNGeneratorGradientBox.swift; sourceTree = SOURCE_ROOT; };
+		96756D191D4B70A300A51F68 /* AHNGeneratorGradientLinear.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGeneratorGradientLinear.swift; path = AHNoise/AHNGeneratorGradientLinear.swift; sourceTree = SOURCE_ROOT; };
+		96756D1A1D4B70A300A51F68 /* AHNGeneratorGradientRadial.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGeneratorGradientRadial.swift; path = AHNoise/AHNGeneratorGradientRadial.swift; sourceTree = SOURCE_ROOT; };
+		96756D1B1D4B70A300A51F68 /* AHNGeneratorRidgedMulti.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGeneratorRidgedMulti.swift; path = AHNoise/AHNGeneratorRidgedMulti.swift; sourceTree = SOURCE_ROOT; };
+		96756D1C1D4B70A300A51F68 /* AHNGeneratorSimplex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGeneratorSimplex.swift; path = AHNoise/AHNGeneratorSimplex.swift; sourceTree = SOURCE_ROOT; };
+		96756D1D1D4B70A300A51F68 /* AHNGeneratorSphere.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGeneratorSphere.swift; path = AHNoise/AHNGeneratorSphere.swift; sourceTree = SOURCE_ROOT; };
+		96756D1E1D4B70A300A51F68 /* AHNGeneratorVoronoi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGeneratorVoronoi.swift; path = AHNoise/AHNGeneratorVoronoi.swift; sourceTree = SOURCE_ROOT; };
+		96756D1F1D4B70A300A51F68 /* AHNGeneratorWave.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNGeneratorWave.swift; path = AHNoise/AHNGeneratorWave.swift; sourceTree = SOURCE_ROOT; };
+		96756D201D4B70A300A51F68 /* AHNModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifier.swift; path = AHNoise/AHNModifier.swift; sourceTree = SOURCE_ROOT; };
+		96756D211D4B70A300A51F68 /* AHNModifierAbsolute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierAbsolute.swift; path = AHNoise/AHNModifierAbsolute.swift; sourceTree = SOURCE_ROOT; };
+		96756D221D4B70A300A51F68 /* AHNModifierBlur.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierBlur.swift; path = AHNoise/AHNModifierBlur.swift; sourceTree = SOURCE_ROOT; };
+		96756D231D4B70A300A51F68 /* AHNModifierClamp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierClamp.swift; path = AHNoise/AHNModifierClamp.swift; sourceTree = SOURCE_ROOT; };
+		96756D241D4B70A300A51F68 /* AHNModifierColour.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierColour.swift; path = AHNoise/AHNModifierColour.swift; sourceTree = SOURCE_ROOT; };
+		96756D251D4B70A300A51F68 /* AHNModifierInvert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierInvert.swift; path = AHNoise/AHNModifierInvert.swift; sourceTree = SOURCE_ROOT; };
+		96756D261D4B70A300A51F68 /* AHNModifierLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierLoop.swift; path = AHNoise/AHNModifierLoop.swift; sourceTree = SOURCE_ROOT; };
+		96756D271D4B70A300A51F68 /* AHNModifierMapNormal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierMapNormal.swift; path = AHNoise/AHNModifierMapNormal.swift; sourceTree = SOURCE_ROOT; };
+		96756D281D4B70A300A51F68 /* AHNModifierPerspective.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierPerspective.swift; path = AHNoise/AHNModifierPerspective.swift; sourceTree = SOURCE_ROOT; };
+		96756D291D4B70A300A51F68 /* AHNModifierRotate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierRotate.swift; path = AHNoise/AHNModifierRotate.swift; sourceTree = SOURCE_ROOT; };
+		96756D2A1D4B70A300A51F68 /* AHNModifierRound.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierRound.swift; path = AHNoise/AHNModifierRound.swift; sourceTree = SOURCE_ROOT; };
+		96756D2B1D4B70A300A51F68 /* AHNModifierScaleBias.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierScaleBias.swift; path = AHNoise/AHNModifierScaleBias.swift; sourceTree = SOURCE_ROOT; };
+		96756D2C1D4B70A300A51F68 /* AHNModifierScaleCanvas.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierScaleCanvas.swift; path = AHNoise/AHNModifierScaleCanvas.swift; sourceTree = SOURCE_ROOT; };
+		96756D2D1D4B70A300A51F68 /* AHNModifierStep.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierStep.swift; path = AHNoise/AHNModifierStep.swift; sourceTree = SOURCE_ROOT; };
+		96756D2E1D4B70A300A51F68 /* AHNModifierStretch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierStretch.swift; path = AHNoise/AHNModifierStretch.swift; sourceTree = SOURCE_ROOT; };
+		96756D2F1D4B70A300A51F68 /* AHNModifierSwirl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNModifierSwirl.swift; path = AHNoise/AHNModifierSwirl.swift; sourceTree = SOURCE_ROOT; };
+		96756D301D4B70A300A51F68 /* AHNSelector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNSelector.swift; path = AHNoise/AHNSelector.swift; sourceTree = SOURCE_ROOT; };
+		96756D311D4B70A300A51F68 /* AHNSelectorBlend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNSelectorBlend.swift; path = AHNoise/AHNSelectorBlend.swift; sourceTree = SOURCE_ROOT; };
+		96756D321D4B70A300A51F68 /* AHNSelectorSelect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNSelectorSelect.swift; path = AHNoise/AHNSelectorSelect.swift; sourceTree = SOURCE_ROOT; };
+		96756D331D4B70A300A51F68 /* AHNTextureProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AHNTextureProvider.swift; path = AHNoise/AHNTextureProvider.swift; sourceTree = SOURCE_ROOT; };
+		96756D341D4B70A300A51F68 /* Combiners.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Combiners.metal; path = AHNoise/Combiners.metal; sourceTree = SOURCE_ROOT; };
+		96756D351D4B70A300A51F68 /* Generators.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Generators.metal; path = AHNoise/Generators.metal; sourceTree = SOURCE_ROOT; };
+		96756D361D4B70A300A51F68 /* Modifiers.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Modifiers.metal; path = AHNoise/Modifiers.metal; sourceTree = SOURCE_ROOT; };
+		96756D371D4B70A300A51F68 /* Selectors.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Selectors.metal; path = AHNoise/Selectors.metal; sourceTree = SOURCE_ROOT; };
+		96756D381D4B70A300A51F68 /* UIImage+AHNoise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "UIImage+AHNoise.swift"; path = "AHNoise/UIImage+AHNoise.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -149,45 +167,54 @@
 		96275AF11D00AC77004BAB53 /* AHNoise */ = {
 			isa = PBXGroup;
 			children = (
-				96275AF31D00AC9F004BAB53 /* AHNCombiner.swift */,
-				96275AF41D00AC9F004BAB53 /* AHNCombinerAdd.swift */,
-				96275AF51D00AC9F004BAB53 /* AHNCombinerDivide.swift */,
-				96275AF61D00AC9F004BAB53 /* AHNCombinerMax.swift */,
-				96275AF71D00AC9F004BAB53 /* AHNCombinerMin.swift */,
-				96275AF81D00AC9F004BAB53 /* AHNCombinerMultiply.swift */,
-				96275AF91D00AC9F004BAB53 /* AHNCombinerPower.swift */,
-				96275AFA1D00AC9F004BAB53 /* AHNCombinerSubtract.swift */,
-				96275AFB1D00AC9F004BAB53 /* AHNContext.swift */,
-				96275AFC1D00AC9F004BAB53 /* AHNGenerator.swift */,
-				96275AFD1D00AC9F004BAB53 /* AHNGeneratorBillow.swift */,
-				96275AFE1D00AC9F004BAB53 /* AHNGeneratorConstant.swift */,
-				96275AFF1D00AC9F004BAB53 /* AHNGeneratorRidgedMulti.swift */,
-				96275B001D00AC9F004BAB53 /* AHNGeneratorSimplex.swift */,
-				96275B011D00AC9F004BAB53 /* AHNModifier.swift */,
-				96275B021D00AC9F004BAB53 /* AHNModifierAbsolute.swift */,
-				96275B031D00AC9F004BAB53 /* AHNModifierBlur.swift */,
-				96275B041D00AC9F004BAB53 /* AHNModifierClamp.swift */,
-				96275B051D00AC9F004BAB53 /* AHNModifierColour.swift */,
-				96275B061D00AC9F004BAB53 /* AHNModifierInvert.swift */,
-				96275B071D00AC9F004BAB53 /* AHNModifierLoop.swift */,
-				96275B401D00AD56004BAB53 /* AHNTextureProvider.swift */,
-				96275B081D00AC9F004BAB53 /* AHNModifierNormalMap.swift */,
-				96275B091D00AC9F004BAB53 /* AHNModifierPerspective.swift */,
-				96275B0A1D00AC9F004BAB53 /* AHNModifierRotate.swift */,
-				96275B0B1D00AC9F004BAB53 /* AHNModifierRound.swift */,
-				96275B0C1D00AC9F004BAB53 /* AHNModifierScaleBias.swift */,
-				96275B0D1D00AC9F004BAB53 /* AHNModifierScaleCanvas.swift */,
-				96275B0E1D00AC9F004BAB53 /* AHNModifierStep.swift */,
-				96275B0F1D00AC9F004BAB53 /* AHNModifierStretch.swift */,
-				96275B101D00AC9F004BAB53 /* AHNModifierSwirl.swift */,
-				96275B111D00AC9F004BAB53 /* AHNSelector.swift */,
-				96275B121D00AC9F004BAB53 /* AHNSelectorBlend.swift */,
-				96275B131D00AC9F004BAB53 /* AHNSelectorSelect.swift */,
-				96275B141D00AC9F004BAB53 /* Combiners.metal */,
-				96275B151D00AC9F004BAB53 /* Generators.metal */,
-				96275B161D00AC9F004BAB53 /* Modifiers.metal */,
-				96275B171D00AC9F004BAB53 /* Selectors.metal */,
-				96275B181D00AC9F004BAB53 /* UIImage+AHNoise.swift */,
+				96756D091D4B70A300A51F68 /* AHNCombiner.swift */,
+				96756D0A1D4B70A300A51F68 /* AHNCombinerAdd.swift */,
+				96756D0B1D4B70A300A51F68 /* AHNCombinerDivide.swift */,
+				96756D0C1D4B70A300A51F68 /* AHNCombinerMax.swift */,
+				96756D0D1D4B70A300A51F68 /* AHNCombinerMin.swift */,
+				96756D0E1D4B70A300A51F68 /* AHNCombinerMultiply.swift */,
+				96756D0F1D4B70A300A51F68 /* AHNCombinerPower.swift */,
+				96756D101D4B70A300A51F68 /* AHNCombinerSubtract.swift */,
+				96756D111D4B70A300A51F68 /* AHNContext.swift */,
+				96756D121D4B70A300A51F68 /* AHNGenerator.swift */,
+				96756D131D4B70A300A51F68 /* AHNGeneratorBillow.swift */,
+				96756D141D4B70A300A51F68 /* AHNGeneratorChecker.swift */,
+				96756D151D4B70A300A51F68 /* AHNGeneratorCoherent.swift */,
+				96756D161D4B70A300A51F68 /* AHNGeneratorConstant.swift */,
+				96756D171D4B70A300A51F68 /* AHNGeneratorCylinder.swift */,
+				96756D181D4B70A300A51F68 /* AHNGeneratorGradientBox.swift */,
+				96756D191D4B70A300A51F68 /* AHNGeneratorGradientLinear.swift */,
+				96756D1A1D4B70A300A51F68 /* AHNGeneratorGradientRadial.swift */,
+				96756D1B1D4B70A300A51F68 /* AHNGeneratorRidgedMulti.swift */,
+				96756D1C1D4B70A300A51F68 /* AHNGeneratorSimplex.swift */,
+				96756D1D1D4B70A300A51F68 /* AHNGeneratorSphere.swift */,
+				96756D1E1D4B70A300A51F68 /* AHNGeneratorVoronoi.swift */,
+				96756D1F1D4B70A300A51F68 /* AHNGeneratorWave.swift */,
+				96756D201D4B70A300A51F68 /* AHNModifier.swift */,
+				96756D211D4B70A300A51F68 /* AHNModifierAbsolute.swift */,
+				96756D221D4B70A300A51F68 /* AHNModifierBlur.swift */,
+				96756D231D4B70A300A51F68 /* AHNModifierClamp.swift */,
+				96756D241D4B70A300A51F68 /* AHNModifierColour.swift */,
+				96756D251D4B70A300A51F68 /* AHNModifierInvert.swift */,
+				96756D261D4B70A300A51F68 /* AHNModifierLoop.swift */,
+				96756D271D4B70A300A51F68 /* AHNModifierMapNormal.swift */,
+				96756D281D4B70A300A51F68 /* AHNModifierPerspective.swift */,
+				96756D291D4B70A300A51F68 /* AHNModifierRotate.swift */,
+				96756D2A1D4B70A300A51F68 /* AHNModifierRound.swift */,
+				96756D2B1D4B70A300A51F68 /* AHNModifierScaleBias.swift */,
+				96756D2C1D4B70A300A51F68 /* AHNModifierScaleCanvas.swift */,
+				96756D2D1D4B70A300A51F68 /* AHNModifierStep.swift */,
+				96756D2E1D4B70A300A51F68 /* AHNModifierStretch.swift */,
+				96756D2F1D4B70A300A51F68 /* AHNModifierSwirl.swift */,
+				96756D301D4B70A300A51F68 /* AHNSelector.swift */,
+				96756D311D4B70A300A51F68 /* AHNSelectorBlend.swift */,
+				96756D321D4B70A300A51F68 /* AHNSelectorSelect.swift */,
+				96756D331D4B70A300A51F68 /* AHNTextureProvider.swift */,
+				96756D341D4B70A300A51F68 /* Combiners.metal */,
+				96756D351D4B70A300A51F68 /* Generators.metal */,
+				96756D361D4B70A300A51F68 /* Modifiers.metal */,
+				96756D371D4B70A300A51F68 /* Selectors.metal */,
+				96756D381D4B70A300A51F68 /* UIImage+AHNoise.swift */,
 			);
 			name = AHNoise;
 			sourceTree = "<group>";
@@ -265,47 +292,56 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				96275B211D00AC9F004BAB53 /* AHNCombinerSubtract.swift in Sources */,
+				96756D501D4B70A300A51F68 /* AHNModifier.swift in Sources */,
+				96756D4F1D4B70A300A51F68 /* AHNGeneratorWave.swift in Sources */,
+				96756D4A1D4B70A300A51F68 /* AHNGeneratorGradientRadial.swift in Sources */,
+				96756D401D4B70A300A51F68 /* AHNCombinerSubtract.swift in Sources */,
 				960494DA1D00778E009B4F6D /* ViewController.swift in Sources */,
-				96275B331D00AC9F004BAB53 /* AHNModifierScaleBias.swift in Sources */,
-				96275B2F1D00AC9F004BAB53 /* AHNModifierNormalMap.swift in Sources */,
-				96275B311D00AC9F004BAB53 /* AHNModifierRotate.swift in Sources */,
-				96275B1E1D00AC9F004BAB53 /* AHNCombinerMin.swift in Sources */,
-				96275B2C1D00AC9F004BAB53 /* AHNModifierColour.swift in Sources */,
-				96275B1F1D00AC9F004BAB53 /* AHNCombinerMultiply.swift in Sources */,
-				96275B371D00AC9F004BAB53 /* AHNModifierSwirl.swift in Sources */,
-				96275B271D00AC9F004BAB53 /* AHNGeneratorSimplex.swift in Sources */,
-				96275B1D1D00AC9F004BAB53 /* AHNCombinerMax.swift in Sources */,
-				96275B1C1D00AC9F004BAB53 /* AHNCombinerDivide.swift in Sources */,
-				96275B2E1D00AC9F004BAB53 /* AHNModifierLoop.swift in Sources */,
-				96275B281D00AC9F004BAB53 /* AHNModifier.swift in Sources */,
-				96275B2B1D00AC9F004BAB53 /* AHNModifierClamp.swift in Sources */,
-				96275B2A1D00AC9F004BAB53 /* AHNModifierBlur.swift in Sources */,
+				96756D3D1D4B70A300A51F68 /* AHNCombinerMin.swift in Sources */,
+				96756D451D4B70A300A51F68 /* AHNGeneratorCoherent.swift in Sources */,
+				96756D3E1D4B70A300A51F68 /* AHNCombinerMultiply.swift in Sources */,
+				96756D551D4B70A300A51F68 /* AHNModifierInvert.swift in Sources */,
+				96756D481D4B70A300A51F68 /* AHNGeneratorGradientBox.swift in Sources */,
+				96756D601D4B70A300A51F68 /* AHNSelector.swift in Sources */,
+				96756D5D1D4B70A300A51F68 /* AHNModifierStep.swift in Sources */,
+				96756D5B1D4B70A300A51F68 /* AHNModifierScaleBias.swift in Sources */,
+				96756D4B1D4B70A300A51F68 /* AHNGeneratorRidgedMulti.swift in Sources */,
+				96756D3C1D4B70A300A51F68 /* AHNCombinerMax.swift in Sources */,
+				96756D5E1D4B70A300A51F68 /* AHNModifierStretch.swift in Sources */,
+				96756D631D4B70A300A51F68 /* AHNTextureProvider.swift in Sources */,
+				96756D3B1D4B70A300A51F68 /* AHNCombinerDivide.swift in Sources */,
 				960494D81D00778E009B4F6D /* AppDelegate.swift in Sources */,
-				96275B251D00AC9F004BAB53 /* AHNGeneratorConstant.swift in Sources */,
-				96275B3B1D00AC9F004BAB53 /* Combiners.metal in Sources */,
-				96275B3C1D00AC9F004BAB53 /* Generators.metal in Sources */,
-				96275B231D00AC9F004BAB53 /* AHNGenerator.swift in Sources */,
-				96275B3A1D00AC9F004BAB53 /* AHNSelectorSelect.swift in Sources */,
-				96275B221D00AC9F004BAB53 /* AHNContext.swift in Sources */,
-				96275B261D00AC9F004BAB53 /* AHNGeneratorRidgedMulti.swift in Sources */,
-				96275B411D00AD56004BAB53 /* AHNTextureProvider.swift in Sources */,
-				96275B2D1D00AC9F004BAB53 /* AHNModifierInvert.swift in Sources */,
-				96275B1B1D00AC9F004BAB53 /* AHNCombinerAdd.swift in Sources */,
-				96275B351D00AC9F004BAB53 /* AHNModifierStep.swift in Sources */,
-				96275B361D00AC9F004BAB53 /* AHNModifierStretch.swift in Sources */,
-				96275B301D00AC9F004BAB53 /* AHNModifierPerspective.swift in Sources */,
-				96275B201D00AC9F004BAB53 /* AHNCombinerPower.swift in Sources */,
-				96275B3E1D00AC9F004BAB53 /* Selectors.metal in Sources */,
-				96275B291D00AC9F004BAB53 /* AHNModifierAbsolute.swift in Sources */,
-				96275B381D00AC9F004BAB53 /* AHNSelector.swift in Sources */,
-				96275B321D00AC9F004BAB53 /* AHNModifierRound.swift in Sources */,
-				96275B241D00AC9F004BAB53 /* AHNGeneratorBillow.swift in Sources */,
-				96275B3F1D00AC9F004BAB53 /* UIImage+AHNoise.swift in Sources */,
-				96275B1A1D00AC9F004BAB53 /* AHNCombiner.swift in Sources */,
-				96275B391D00AC9F004BAB53 /* AHNSelectorBlend.swift in Sources */,
-				96275B3D1D00AC9F004BAB53 /* Modifiers.metal in Sources */,
-				96275B341D00AC9F004BAB53 /* AHNModifierScaleCanvas.swift in Sources */,
+				96756D471D4B70A300A51F68 /* AHNGeneratorCylinder.swift in Sources */,
+				96756D5F1D4B70A300A51F68 /* AHNModifierSwirl.swift in Sources */,
+				96756D5A1D4B70A300A51F68 /* AHNModifierRound.swift in Sources */,
+				96756D581D4B70A300A51F68 /* AHNModifierPerspective.swift in Sources */,
+				96756D421D4B70A300A51F68 /* AHNGenerator.swift in Sources */,
+				96756D5C1D4B70A300A51F68 /* AHNModifierScaleCanvas.swift in Sources */,
+				96756D561D4B70A300A51F68 /* AHNModifierLoop.swift in Sources */,
+				96756D521D4B70A300A51F68 /* AHNModifierBlur.swift in Sources */,
+				96756D511D4B70A300A51F68 /* AHNModifierAbsolute.swift in Sources */,
+				96756D411D4B70A300A51F68 /* AHNContext.swift in Sources */,
+				96756D4D1D4B70A300A51F68 /* AHNGeneratorSphere.swift in Sources */,
+				96756D3A1D4B70A300A51F68 /* AHNCombinerAdd.swift in Sources */,
+				96756D3F1D4B70A300A51F68 /* AHNCombinerPower.swift in Sources */,
+				96756D431D4B70A300A51F68 /* AHNGeneratorBillow.swift in Sources */,
+				96756D491D4B70A300A51F68 /* AHNGeneratorGradientLinear.swift in Sources */,
+				96756D661D4B70A300A51F68 /* Modifiers.metal in Sources */,
+				96756D681D4B70A300A51F68 /* UIImage+AHNoise.swift in Sources */,
+				96756D461D4B70A300A51F68 /* AHNGeneratorConstant.swift in Sources */,
+				96756D611D4B70A300A51F68 /* AHNSelectorBlend.swift in Sources */,
+				96756D541D4B70A300A51F68 /* AHNModifierColour.swift in Sources */,
+				96756D591D4B70A300A51F68 /* AHNModifierRotate.swift in Sources */,
+				96756D641D4B70A300A51F68 /* Combiners.metal in Sources */,
+				96756D531D4B70A300A51F68 /* AHNModifierClamp.swift in Sources */,
+				96756D391D4B70A300A51F68 /* AHNCombiner.swift in Sources */,
+				96756D671D4B70A300A51F68 /* Selectors.metal in Sources */,
+				96756D4C1D4B70A300A51F68 /* AHNGeneratorSimplex.swift in Sources */,
+				96756D571D4B70A300A51F68 /* AHNModifierMapNormal.swift in Sources */,
+				96756D4E1D4B70A300A51F68 /* AHNGeneratorVoronoi.swift in Sources */,
+				96756D621D4B70A300A51F68 /* AHNSelectorSelect.swift in Sources */,
+				96756D441D4B70A300A51F68 /* AHNGeneratorChecker.swift in Sources */,
+				96756D651D4B70A300A51F68 /* Generators.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

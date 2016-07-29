@@ -16,7 +16,7 @@ import simd
  
  The value of the output is calculated by first calculating the average value of the three colour channels, then selecting the maximum value and writing the three channels to the output in order to retain colour.
  
- For example a pixel with a noise value of -0.4 [0.3 in colour space] when compared with another pixel with a noise value of 0.2 [0.6 in colour space] will result in a noise value of 0.2 [0.6 in colour space].
+ For example a pixel with a noise value of `0.3` when compared with another pixel with a noise value of `0.6` will result in a noise value of `0.6`.
  */
 public class AHNCombinerMax: AHNCombiner {
   
@@ -24,13 +24,7 @@ public class AHNCombinerMax: AHNCombiner {
   // MARK:- Initialiser
   
   
-  /**
-   Creates a new `AHNCombinerMax` object.
-   
-   - parameter input1: The first input that will be compared to `input2` to provide the output.
-   - parameter input2: The second input that will be compared to `input1` to provide the output.
-   */
-  public init(input1: AHNTextureProvider, input2: AHNTextureProvider){
-    super.init(functionName: "maxCombiner", input1: input1, input2: input2)
+  required public init(){
+    super.init(functionName: "maxCombiner")
   }
 }

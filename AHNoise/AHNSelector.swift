@@ -28,7 +28,7 @@ public class AHNSelector: NSObject, AHNTextureProvider{
   
   
   ///The `MTLComputePipelineState` used to run the `Metal` compute kernel on the GPU.
-  private let pipeline: MTLComputePipelineState
+  let pipeline: MTLComputePipelineState
   
   
   
@@ -38,7 +38,7 @@ public class AHNSelector: NSObject, AHNTextureProvider{
   
   
   ///The `MTLTexture` that the compute kernel writes to as an output.
-  private var internalTexture: MTLTexture?
+  var internalTexture: MTLTexture?
   
   
   
@@ -47,63 +47,18 @@ public class AHNSelector: NSObject, AHNTextureProvider{
    
    The function used is specific to each class.
    */
-  private let kernelFunction: MTLFunction
+  let kernelFunction: MTLFunction
   
   
   
   ///Indicates whether or not the `internalTexture` needs updating.
-  internal var dirty: Bool
+  public var dirty: Bool = true
   
   
   
   ///The first input that will be combined with `provider2` using `selector` to provide the output.
-  private var provider: AHNTextureProvider?
-  
-  
-  
-  ///The second input that will be combined with `provider` using `selector` to provide the output.
-  private var provider2: AHNTextureProvider?
-  
-  
-  
-  ///The `AHNTextureProvider` that selects which input to write to the output `MTLTexture` depending on its value at each pixel.
-  private var internalSelector: AHNTextureProvider?
-  
-  
-  
-  /**
-   The width of the output `MTLTexure`.
-   
-   This is dictated by the width of the texture of the first input `AHNTextureProvider`. If there is no input, the default width is 128 pixels.
-   */
-  private var width: Int{
-    get{
-      return provider?.textureSize().width ?? 128
-    }
-  }
-  
-  
-  
-  /**
-   The height of the output `MTLTexure`.
-   
-   This is dictated by the height of the texture of the first input `AHNTextureProvider`. If there is no input, the default height is 128 pixels.
-   */
-  private var height: Int{
-    get{
-      return provider?.textureSize().height ?? 128
-    }
-  }
-  
-  
-  
-  ///The first input that will be combined with `provider2` using `selector` to provide the output.
-  public var input1: AHNTextureProvider?{
-    get{
-      return provider
-    }
-    set{
-      provider = newValue
+  public var provider: AHNTextureProvider?{
+    didSet{
       dirty = true
     }
   }
@@ -111,12 +66,8 @@ public class AHNSelector: NSObject, AHNTextureProvider{
   
   
   ///The second input that will be combined with `provider` using `selector` to provide the output.
-  public var input2: AHNTextureProvider?{
-    get{
-      return provider2
-    }
-    set{
-      provider2 = newValue
+  public var provider2: AHNTextureProvider?{
+    didSet{
       dirty = true
     }
   }
@@ -125,16 +76,47 @@ public class AHNSelector: NSObject, AHNTextureProvider{
   
   ///The `AHNTextureProvider` that selects which input to write to the output `MTLTexture` depending on its value at each pixel.
   public var selector: AHNTextureProvider?{
-    get{
-      return internalSelector
-    }
-    set{
-      internalSelector = newValue
+    didSet{
       dirty = true
     }
   }
   
   
+  
+  /**
+   The width of the output `MTLTexure`.
+   
+   This is dictated by the width of the texture of the first input `AHNTextureProvider`. If there is no input, the default width is `128` pixels.
+   */
+  public var textureWidth: Int{
+    get{
+      if let provider = provider, provider2 = provider2, selector = selector{
+        return max(provider.textureSize().width, provider2.textureSize().width, selector.textureSize().width)
+      }else{
+        return 128
+      }
+    }
+  }
+  
+  
+  
+  /**
+   The height of the output `MTLTexure`.
+   
+   This is dictated by the height of the texture of the first input `AHNTextureProvider`. If there is no input, the default height is `128` pixels.
+   */
+  public var textureHeight: Int{
+    get{
+      if let provider = provider, provider2 = provider2, selector = selector{
+        return max(provider.textureSize().height, provider2.textureSize().height, selector.textureSize().height)
+      }else{
+        return 128
+      }
+    }
+  }
+
+  
+  public var modName: String = ""
   
   
   
@@ -163,19 +145,11 @@ public class AHNSelector: NSObject, AHNTextureProvider{
    
    To be called when instantiating a subclass.
    
-   - parameter functionName: The name of the kernel function that this generator will use to combine inputs.
-   - parameter input1: The first input that will be combined with `input2` using `selector` to provide the output.
-   - parameter input2: The second input that will be combined with `input1` using `selector` to provide the output.
-   - parameter selector: The `AHNTextureProvider` that selects which input to write to the output `MTLTexture` depending on its value at each pixel.
+   - parameter functionName: The name of the kernel function that this selector will use to modify the inputs.
    */
-  public init(functionName: String, input1: AHNTextureProvider, input2: AHNTextureProvider, selector: AHNTextureProvider){
-    
-    // Ensure input textures and selector have the same size
-    assert(input1.textureSize().width == input2.textureSize().width && selector.textureSize().width == input2.textureSize().width, "Inputs must have the same texture width")
-    assert(input1.textureSize().height == input2.textureSize().height && selector.textureSize().height == input2.textureSize().height, "Inputs must have the same texture height")
-    
+  init(functionName: String) {
     // Gather the context to use from the first input
-    context = input1.context
+    context = AHNContext.SharedContext
     
     // Load the kernel function and compute pipeline state
     guard let kernelFunction = context.library.newFunctionWithName(functionName) else{
@@ -185,19 +159,32 @@ public class AHNSelector: NSObject, AHNTextureProvider{
     
     do{
       try pipeline = context.device.newComputePipelineStateWithFunction(kernelFunction)
-    }catch{
-      fatalError("AHNoise: Error creating pipeline state for \(functionName).")
+    }catch let error{
+      fatalError("AHNoise: Error creating pipeline state for \(functionName).\n\(error)")
     }
     
-    // Set the texture to update
-    dirty = true
-    
-    provider = input1
-    provider2 = input2
-    internalSelector = selector
     super.init()
   }
   
+  
+  
+  override public required init(){
+    context = AHNContext.SharedContext
+
+    // Load the kernel function and compute pipeline state
+    guard let kernelFunction = context.library.newFunctionWithName("simplexGenerator") else{
+      fatalError("AHNoise: Error loading function simplexGenerator.")
+    }
+    self.kernelFunction = kernelFunction
+    
+    do{
+      try pipeline = context.device.newComputePipelineStateWithFunction(kernelFunction)
+    }catch let error{
+      fatalError("AHNoise: Error creating pipeline state for simplexGenerator.\n\(error)")
+    }
+    
+    super.init()
+  }
   
   
   
@@ -243,26 +230,26 @@ public class AHNSelector: NSObject, AHNTextureProvider{
    This should not need to be called manually as it is called by the `texture()` method automatically if the texture does not represent the current `AHNTextureProvider` properties.
    */
   public func updateTexture(){
-    guard let provider1 = provider, provider2 = provider2, selector = selector else { return }
+    guard let provider1 = provider?.texture(), provider2 = provider2?.texture(), selector = selector?.texture() else { return }
     
     // Create the internalTexture if it equals nil or is the wrong size.
     if internalTexture == nil{
       newInternalTexture()
     }
-    if internalTexture!.width != width || internalTexture!.height != height{
+    if internalTexture!.width != textureWidth || internalTexture!.height != textureHeight{
       newInternalTexture()
     }
     
     let threadGroupsCount = MTLSizeMake(8, 8, 1)
-    let threadGroups = MTLSizeMake(width / threadGroupsCount.width, height / threadGroupsCount.height, 1)
+    let threadGroups = MTLSizeMake(textureWidth / threadGroupsCount.width, textureHeight / threadGroupsCount.height, 1)
     
     let commandBuffer = context.commandQueue.commandBuffer()
     
     let commandEncoder = commandBuffer.computeCommandEncoder()
     commandEncoder.setComputePipelineState(pipeline)
-    commandEncoder.setTexture(provider1.texture(), atIndex: 0)
-    commandEncoder.setTexture(provider2.texture(), atIndex: 1)
-    commandEncoder.setTexture(selector.texture(), atIndex: 2)
+    commandEncoder.setTexture(provider1, atIndex: 0)
+    commandEncoder.setTexture(provider2, atIndex: 1)
+    commandEncoder.setTexture(selector, atIndex: 2)
     commandEncoder.setTexture(internalTexture, atIndex: 3)
     
     // Encode the uniform buffer
@@ -278,26 +265,26 @@ public class AHNSelector: NSObject, AHNTextureProvider{
   
   
   ///Create a new `internalTexture` for the first time or whenever the texture is resized.
-  private func newInternalTexture(){
-    let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(.RGBA8Unorm, width: width, height: height, mipmapped: false)
+  func newInternalTexture(){
+    let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(.RGBA8Unorm, width: textureWidth, height: textureHeight, mipmapped: false)
     internalTexture = context.device.newTextureWithDescriptor(textureDescriptor)
   }
   
   
   
   ///- returns: The updated output `MTLTexture` for the `AHNSelector`.
-  public func texture() -> MTLTexture{
+  public func texture() -> MTLTexture?{
     if isDirty(){
       updateTexture()
     }
-    return internalTexture!
+    return internalTexture
   }
   
   
   
   ///- returns: The MTLSize of the the output `MTLTexture`. If no size has been explicitly set, the default value returned is `128x128` pixels.
   public func textureSize() -> MTLSize{
-    return MTLSizeMake(width, height, 1)
+    return MTLSizeMake(textureWidth, textureHeight, 1)
   }
   
   
@@ -315,5 +302,13 @@ public class AHNSelector: NSObject, AHNTextureProvider{
     let dirtyProvider2 = provider2?.isDirty() ?? false
     let dirtySelector = selector?.isDirty() ?? false
     return dirtyProvider1 || dirtyProvider2 || dirtySelector || dirty
+  }
+  
+  
+  
+  
+  ///- returns: `False` if either of the two inputs or the selector is not set.
+  public func canUpdate() -> Bool {
+    return provider != nil && provider2 != nil && selector != nil
   }
 }

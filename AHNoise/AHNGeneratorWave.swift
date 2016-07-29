@@ -1,61 +1,41 @@
 //
-//  AHNModifierStep.swift
-//  AHNoise
+//  AHNGeneratorWave.swift
+//  Noise Studio
 //
-//  Created by Andrew Heard on 24/02/2016.
+//  Created by App Work on 07/07/2016.
 //  Copyright © 2016 Andrew Heard. All rights reserved.
 //
 
-
-import Metal
+import UIKit
 import simd
 
 
-/**
- Takes the outputs of any class that adheres to the `AHNTextureProvider` protocol and maps values larger than the `boundary` value to the `highValue`, and those below to the `lowValue`.
- 
- For example if a pixel has a value of `0.6`, the `boundary` is set to `0.5`, the `highValue` set to `0.7` and the `lowValue` set to `0.1`, the returned value will be `0.1`.
- 
- The output of this module will always be greyscale as the output value is written to all three colour channels equally.
- 
- *Conforms to the `AHNTextureProvider` protocol.*
- */
-public class AHNModifierStep: AHNModifier{
+///Struct used to communicate properties to the GPU.
+struct WaveInputs {
+  var frequency: Float
+  var offsetStrength: Float
+  var rotations: vector_float3
+}
+
+
+///Generates a series of sinusoidal waves represented by black and white lines.
+///
+///*Conforms to the `AHNTextureProvider` protocol.*
+public class AHNGeneratorWave: AHNGenerator  {
+  
+  var allowableControls: [String] = ["textureWidth", "textureHeight", "frequency", "offsetStrength", "xRotation", "yRotation", "zRotation"]
   
   
   // MARK:- Properties
   
-  var allowableControls: [String] = ["lowValue", "highValue", "boundary"]
   
   
-  
-  
-  
-  ///The low value (default value is `0.0`) to output if the noise value is lower than the `boundary`.
-  public var lowValue: Float = 0{
+  ///Increases the number and compactness of waves visible in the texture. The default value is `1.0`.
+  public var frequency: Float = 1{
     didSet{
       dirty = true
     }
   }
-
-  
-  
-  ///The hight value (default value is `1.0`) to output if the noise value is higher than the `boundary`.
-  public var highValue: Float = 1{
-    didSet{
-      dirty = true
-    }
-  }
-
-  
-  
-  ///The value at which to perform the step. Texture values lower than this are returned as `lowValue` and those above are returned as `highValue`. The default value is `0.5`.
-  public var boundary: Float = 0.5{
-    didSet{
-      dirty = true
-    }
-  }
-  
   
   
   
@@ -68,13 +48,9 @@ public class AHNModifierStep: AHNModifier{
   
   // MARK:- Initialiser
   
-  
   required public init(){
-    super.init(functionName: "stepModifier")
+    super.init(functionName: "waveGenerator")
   }
-  
-  
-  
   
   
   
@@ -92,20 +68,18 @@ public class AHNModifierStep: AHNModifier{
   // MARK:- Argument table update
   
   
-  ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
-  public override func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = vector_float3(lowValue, highValue, boundary)
-    
+  ///Encodes the required uniform values for this `AHNGenerator` subclass. This should never be called directly.
+  override public func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
+    var uniforms = WaveInputs(frequency: frequency, offsetStrength: offsetStrength, rotations: vector_float3(xRotation, yRotation, zRotation))
+
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(strideof(vector_float3), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.newBufferWithLength(strideof(WaveInputs), options: .CPUCacheModeDefaultCache)
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, strideof(vector_float3))
+    memcpy(uniformBuffer!.contents(), &uniforms, strideof(WaveInputs))
     
     commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
   }
-  
-  
   
   
   
@@ -141,7 +115,7 @@ public class AHNModifierStep: AHNModifier{
   }
   
   public required init?(coder aDecoder: NSCoder) {
-    super.init(functionName: "stepModifier")
+    super.init(functionName: "waveGenerator")
     var mirror = Mirror(reflecting: self.dynamicType.init())
     repeat{
       for child in mirror.children{

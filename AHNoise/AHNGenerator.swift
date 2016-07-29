@@ -1,142 +1,98 @@
 //
 //  AHNGenerator.swift
-//  AHNoise
+//  Noise Studio
 //
-//  Created by Andrew Heard on 22/02/2016.
+//  Created by App Work on 23/06/2016.
 //  Copyright © 2016 Andrew Heard. All rights reserved.
 //
 
-
-import Metal
-import simd
-
-
-///A struct used to specify the origin of the generated noise in noise space.
-public struct AHNPosition {
-  var x: Float = 1
-  var y: Float = 1
-  
-  init(x: Float, y: Float){
-    self.x = x
-    self.y = y
-  }
-}
-
-
-///Struct used to communicate properties to the GPU.
-internal struct SimplexInputs {
-  var pos: vector_float2
-  var octaves: Int32
-  var persistance: Float
-  var frequency: Float
-  var lacunarity: Float
-  var zValue: Float
-  var wValue: Float
-  var use4D: Int32
-  var sphereMap: Int32
-  var seamless: Int
-}
-
+import UIKit
 
 /**
- The general class to generate cohesive noise outputs. This class is not instantiated directly, but is used by various subclasses.
+ The general class used to output a procedurally generated texture. This class is not instantiated directly, but is used by various subclasses.
+ 
+ The output texture represents a 2D slice through a 3D geometric or noise function that can optionally be distorted in the x and y axes.
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
 public class AHNGenerator: NSObject, AHNTextureProvider {
   
-  
   // MARK:- Properties
+  
+  
+  ///The `AHNContext` that is being used by the `AHNTextureProvider` to communicate with the GPU. This is taken from the `SharedContext` class property of `AHNContext`.
   public var context: AHNContext
-  internal var uniformBuffer: MTLBuffer?
-  private let pipeline: MTLComputePipelineState
-  private var internalTexture: MTLTexture?
-  private let kernelFunction: MTLFunction
-  internal var dirty: Bool
-  internal var use4D: Int = 0
-  internal var sphereMap: Int = 0
-  internal var seamless: Int = 0
-  private var _octaves: Int = 6
-  private var _persistance: Float = 0.5
-  private var _frequency: Float = 1.0
-  private var _lacunarity: Float = 2.0
-  private var width: Int = 128
-  private var height: Int = 128
-  private var pos: AHNPosition = AHNPosition(x: 1, y: 1)
-  private var z: Float = 1
-  private var w: Float = 1
-  private var timeDependant = false
-  private var timer: NSTimer?
   
   
   
-  ///The width (in pixels) of the output noise texture.
-  public var textureWidth: Int{
-    get{
-      return width
-    }
-    set{
-      if newValue % 8 != 0 { print("AHNoise: WARNING - Texture width will be rounded to a factor of 8.") }
-      width = newValue
+  ///The `MTLComputePipelineState` used to run the `Metal` compute kernel on the GPU.
+  let pipeline: MTLComputePipelineState
+  
+  
+  
+  ///The `MTLBuffer` used to transfer the constant values used by the compute kernel to the GPU.
+  public var uniformBuffer: MTLBuffer?
+  
+  
+  
+  ///The `MTLTexture` that the compute kernel writes to as an output.
+  var internalTexture: MTLTexture?
+  
+  
+  
+  ///The default uniform greyscale texture to use as a displacement texture that results in zero displacement.
+  var defaultDisplaceTexture: MTLTexture?
+  
+  
+  
+  ///The texture to offset pixels by in the x axis. Pixel values less than `0.5` offset to the left, and above `0.5` offset to the right.
+  public var xoffsetInput: AHNTextureProvider?{
+    didSet{
       dirty = true
     }
   }
   
   
   
-  ///The height (in pixels) of the output noise texture.
-  public var textureHeight: Int{
-    get{
-      return height
-    }
-    set{
-      if newValue % 8 != 0 { print("AHNoise: WARNING - Texture height will be rounded to a factor of 8.") }
-      height = newValue
+  ///The texture to offset pixels by in the y axis. Pixel values less than `0.5` offset downwards, and above `0.5` offset upwards.
+  public var yoffsetInput: AHNTextureProvider?{
+    didSet{
       dirty = true
     }
   }
   
   
   
-  ///The origin of the noise in noise space. Changing this slightly will make the noise texture appear to move.
-  ///
-  ///Default is (1,1)
-  public var position: AHNPosition{
-    get{
-      return pos
-    }
-    set{
-      pos = newValue
+  ///The intensity of the effects of the `xoffsetInput` and `yoffsetInput`. A value of `0.0` results in no displacement. The default value is `0.2`.
+  public var offsetStrength: Float = 0.2{
+    didSet{
       dirty = true
     }
   }
   
   
   
-  ///The value for the third dimension when calculating the noise.
-  ///
-  ///Default is 1.0.
-  public var zValue: Float{
-    get{
-      return z
-    }
-    set{
-      z = newValue
+  ///The angle (in radians) by which to rotate the 2D slice of the texture about the x axis of the 3D space of the geometric or noise `kernelFunction`. The default value is `0.0`.
+  public var xRotation: Float = 0{
+    didSet{
       dirty = true
     }
   }
   
   
   
-  ///The value for the fourth dimension when calculating 4D noise. This is mostly only used to create spherically mapped or seamless textures.
-  ///
-  ///Default is 1.0.
-  public var wValue: Float{
-    get{
-      return w
+  ///The angle (in radians) by which to rotate the 2D slice of the texture about the y axis of the 3D space of the geometric or noise `kernelFunction`. The default value is `0.0`.
+  public var yRotation: Float = 0{
+    didSet{
+      dirty = true
     }
-    set{
-      w = newValue
+  }
+  
+  
+  
+  ///The angle (in radians) by which to rotate the 2D slice of the texture about the z axis of the 3D space of the geometric or noise `kernelFunction`. The default value is `0.0`.
+  public var zRotation: Float = 0{
+    didSet{
       dirty = true
     }
   }
@@ -144,20 +100,24 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   
   /**
-   The number of `octaves` to use in the texture. Each `octave` is calculated with a different amplitude (altered by the `persistance` property) and `frequency` (altered by the `lacunarity` property).
+   The `MTLFunction` compute kernel that generates the output `MTLTexture` property.
    
-   Each `octave` is calculated and then combined to produce the final value.
-   
-   Higher values (8) produce more detailed noise, where as lower values produce smoother noise. Higher values have a performance impact.
-   
-   Default is 6.
+   The function used is specific to each class.
    */
-  public var octaves: Int{
-    get{
-      return _octaves
-    }
-    set{
-      _octaves = newValue
+  let kernelFunction: MTLFunction
+  
+  
+  
+  ///Indicates whether or not the `internalTexture` needs updating.
+  public var dirty: Bool = true
+  
+  
+  
+  /**
+   The width of the output `MTLTexure` in pixels. The default value is `128`.
+   */
+  public var textureWidth: Int = 128{
+    didSet{
       dirty = true
     }
   }
@@ -165,59 +125,14 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   
   /**
-   Varies the amplitude every `octave`. The amplitude is multipled by the `persisance` for each `octave`. Generally values less than 1.0 are used.
-   
-   For example an initial amplitude of 1.0 (fixed) and a `persistance` of 0.5 for 4 octaves would produce an amplitude of 1.0, 0.5, 0.25 and 0.125 respectively for each octave.
-   
-   Default is 0.5.
+   The height of the output `MTLTexure` in pixels. The default value is `128`.
    */
-  public var persistance: Float{
-    get{
-      return _persistance
-    }
-    set{
-      _persistance = newValue
+  public var textureHeight: Int = 128{
+    didSet{
       dirty = true
     }
   }
-  
-  
-  
-  /**
-   The frequency used when calculating the noise. Higher values produce more dense noise.
-   
-   The `frequency` is multiplied by the `lacunarity` property each octave.
-   
-   Default is 1.0.
-   */
-  public var frequency: Float{
-    get{
-      return _frequency
-    }
-    set{
-      _frequency = newValue
-      dirty = true
-    }
-  }
-  
-  
-  
-  /**
-   Varies the `frequency` every `octave`. The `frequency` is multipled by the `lacunarity` for each `octave`. Generally values less than 1.0 are used.
-   
-   For example an initial `frequency` of 1.0 and a `lacunarity` of 0.5 for 4 octaves would produce a `frequency` of 1.0, 0.5, 0.25 and 0.125 respectively for each octave.
-   
-   Default is 2.0.
-   */
-  public var lacunarity: Float{
-    get{
-      return _lacunarity
-    }
-    set{
-      _lacunarity = newValue
-      dirty = true
-    }
-  }
+  public var modName: String = ""
   
   
   
@@ -226,30 +141,18 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   
   
-  
-  
-  
-  // MARK:- Initialiser
+  // MARK:- Inititalisers
   
   
   /**
    Creates a new `AHNGenerator` object.
    
    To be called when instantiating a subclass.
-
-   - parameter functionName: The name of the kernel function that this generator will use to create noise.
-   - parameter context: The `AHNContext` object that will be used to create the buffers and command encoders required.
-   - parameter textureWidth: The desired width of the output texture in pixels.
-   - parameter textureHeight: The desired height of the output texture in pixels.
-   - parameter use4DNoise: Switches the kernel to use 4D Simplex noise instead of 3D. Useful for when an extra dimension is required, for example to create volumetric noise or seamless noise. Has a higher resource requirement.
-   - parameter mapForSphere: Toggles whether to map the output texture to wrap suitably onto a UV sphere geometry. Implicitly uses 4D noise and is seamless.
-   - parameter makeSeamless: Toggles whether to make the texture seamless. The output will be tileable seamlessly with no mirroring. Implicitly uses 4D noise.
-  */
-  public init(functionName: String, context: AHNContext, textureWidth width: Int, textureHeight height: Int, use4DNoise: Bool, mapForSphere: Bool, makeSeamless: Bool){
-    self.context = context
-    use4D = use4DNoise || mapForSphere || makeSeamless ? 1 : 0
-    sphereMap = mapForSphere ? 1 : 0
-    seamless = makeSeamless ? 1 : 0
+   
+   - parameter functionName: The name of the kernel function that this generator will use to create an output.
+   */
+  public init(functionName: String){
+    context = AHNContext.SharedContext
     guard let kernelFunction = context.library.newFunctionWithName(functionName) else{
       fatalError("AHNoise: Error loading function \(functionName).")
     }
@@ -257,21 +160,31 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
     
     do{
       try pipeline = context.device.newComputePipelineStateWithFunction(kernelFunction)
-    }catch{
-      fatalError("AHNoise: Error creating pipeline state for \(functionName).")
+    }catch let error{
+      fatalError("AHNoise: Error creating pipeline state for \(functionName).\n\(error)")
     }
-    
     dirty = true
     super.init()
-    
-    textureWidth = width
-    textureHeight = height
   }
   
   
   
-  
-  
+  override public required init(){
+    context = AHNContext.SharedContext
+    // Load the kernel function and compute pipeline state
+    guard let kernelFunction = context.library.newFunctionWithName("simplexGenerator") else{
+      fatalError("AHNoise: Error loading function simplexGenerator.")
+    }
+    self.kernelFunction = kernelFunction
+    
+    do{
+      try pipeline = context.device.newComputePipelineStateWithFunction(kernelFunction)
+    }catch let error{
+      fatalError("AHNoise: Error creating pipeline state for simplexGenerator.\n\(error)")
+    }
+    
+    super.init()
+  }
   
   
   
@@ -284,10 +197,10 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   
   /**
-   Override this method in subclasses to configure a uniform buffer to be sent to the kernel.
+   This function is overridden by subclasses to  write class specific variables to the `uniformBuffer`.
    
    - parameter commandEncoder: The `MTLComputeCommandEncoder` used to run the kernel. This can be used to lazily create a buffer of data and add it to the argument table. Any buffer index can be used without affecting the rest of this class.
-  */
+   */
   public func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder){
   }
   
@@ -306,29 +219,32 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   
   // MARK:- Texture Functions
-
+  
   
   /**
    Updates the output `MTLTexture`.
    
-   This should not need to be called manually as it is called by the `texture()` method automatically if the texture does not represent the current `AHNTextureProvider` properties.
+   This should not need to be called manually as it is called by the `texture()` method automatically if the texture does not represent the current properties.
    */
   public func updateTexture(){
     if internalTexture == nil{
       newInternalTexture()
     }
-    if internalTexture!.width != width || internalTexture!.height != height{
+    if internalTexture!.width != textureWidth || internalTexture!.height != textureHeight{
       newInternalTexture()
     }
     
     let threadGroupsCount = MTLSizeMake(8, 8, 1)
-    let threadGroups = MTLSizeMake(width / threadGroupsCount.width, height / threadGroupsCount.height, 1)
+    let threadGroups = MTLSizeMake(textureWidth / threadGroupsCount.width, textureHeight / threadGroupsCount.height, 1)
     
     let commandBuffer = context.commandQueue.commandBuffer()
     
     let commandEncoder = commandBuffer.computeCommandEncoder()
     commandEncoder.setComputePipelineState(pipeline)
     commandEncoder.setTexture(internalTexture, atIndex: 0)
+    commandEncoder.setTexture(xoffsetInput?.texture() ?? defaultDisplaceTexture!, atIndex: 1)
+    commandEncoder.setTexture(yoffsetInput?.texture() ?? defaultDisplaceTexture!, atIndex: 2)
+
     configureArgumentTableWithCommandencoder(commandEncoder)
     commandEncoder.dispatchThreadgroups(threadGroups, threadsPerThreadgroup: threadGroupsCount)
     commandEncoder.endEncoding()
@@ -342,20 +258,30 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   
   ///Create a new `internalTexture` for the first time or whenever the texture is resized.
-  private func newInternalTexture(){
+  func newInternalTexture(){
     let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(.RGBA8Unorm, width: textureWidth, height: textureHeight, mipmapped: false)
     internalTexture = context.device.newTextureWithDescriptor(textureDescriptor)
+    
+    
+    let grey: [UInt8] = [128, 128, 128, 255]
+    var textureBytes: [UInt8] = []
+    for _ in 0..<textureWidth*textureHeight{
+      textureBytes.appendContentsOf(grey)
+    }
+    textureDescriptor.usage = .ShaderRead
+    defaultDisplaceTexture = context.device.newTextureWithDescriptor(textureDescriptor)
+    defaultDisplaceTexture?.replaceRegion(MTLRegionMake2D(0, 0, textureWidth, textureHeight), mipmapLevel: 0, withBytes: &textureBytes, bytesPerRow: 4*textureWidth)
   }
   
   
   
   // Texture Provider
   ///- returns: The updated output `MTLTexture` for this module.
-  public func texture() -> MTLTexture{
+  public func texture() -> MTLTexture?{
     if isDirty(){
       updateTexture()
     }
-    return internalTexture!
+    return internalTexture
   }
   
   
@@ -369,6 +295,15 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   ///- returns: A boolean value indicating whether or not the texture need updating to include updated properties.
   public func isDirty() -> Bool {
-    return dirty
+    let dirtyProvider1 = xoffsetInput?.isDirty() ?? false
+    let dirtyProvider2 = yoffsetInput?.isDirty() ?? false
+    return dirtyProvider1 || dirtyProvider2 || dirty
+  }
+  
+  
+  
+  ///- returns: `True` as this a generator can always update.
+  public func canUpdate() -> Bool {
+    return true
   }
 }

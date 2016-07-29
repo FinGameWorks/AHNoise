@@ -20,30 +20,26 @@ import MetalPerformanceShaders
  */
 public class AHNModifierBlur: AHNModifier {
   
+  var allowableControls: [String] = ["radius"]
   
   // MARK:- Properties
   
   
-  ///The radius of the Gaussian blur.
-  private var _radius: Float = 3
+  ///The radius of the Gaussian blur. The default value is `3.0`.
+  public var radius: Float = 3{
+    didSet{
+      dirty = true
+    }
+  }
   
   
   
   ///The `Metal Performance Shader` used to perform the blur.
-  private var kernel: MPSImageGaussianBlur!
+  var kernel: MPSImageGaussianBlur!
   
   
   
-  ///The radius of the Gaussian blur. Higher values are computationally expensive.
-  public var radius: Float{
-    get{
-      return _radius
-    }
-    set{
-      _radius = newValue
-      dirty = true
-    }
-  }
+
 
   
   
@@ -55,18 +51,10 @@ public class AHNModifierBlur: AHNModifier {
   // MARK:- Initialiser
   
   
-  
-  /**
-   Creates a new `AHNModifierBlur` object.
-   
-   - parameter input: The input to blur.
-   - parameter radius: The radius of the Gaussian blur.
-   */
-  public init(input: AHNTextureProvider, radius: Float){
-    _radius = radius
-    super.init(functionName: "loopModifier", input: input)
+  required public init(){
+    super.init(functionName: "normalMapModifier")
     usesMPS = true
-    kernel = MPSImageGaussianBlur(device: context.device, sigma: _radius)
+    kernel = MPSImageGaussianBlur(device: context.device, sigma: radius)
     kernel.edgeMode = .Clamp
   }
   
@@ -81,8 +69,70 @@ public class AHNModifierBlur: AHNModifier {
   // MARK:- Argument table update
   
   
-  ///Encodes the `Metal Performance Shader` into the command buffer.
+  ///Encodes the `Metal Performance Shader` into the command buffer. This is called by the superclass and should not be called manually.
   override public func addMetalPerformanceShaderToBuffer(commandBuffer: MTLCommandBuffer) {
-    kernel.encodeToCommandBuffer(commandBuffer, sourceTexture: input!.texture(), destinationTexture: internalTexture!)
+    guard let texture = provider?.texture() else { return }
+    kernel = MPSImageGaussianBlur(device: context.device, sigma: radius)
+    kernel.edgeMode = .Clamp
+    kernel.encodeToCommandBuffer(commandBuffer, sourceTexture: texture, destinationTexture: internalTexture!)
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  // MARK:- NSCoding
+  public func encodeWithCoder(aCoder: NSCoder) {
+    var mirror = Mirror(reflecting: self)
+    repeat{
+      for child in mirror.children{
+        if allowableControls.contains(child.label!){
+          if child.value is Int{
+            aCoder.encodeInteger(child.value as! Int, forKey: child.label!)
+          }
+          if child.value is Float{
+            aCoder.encodeFloat(child.value as! Float, forKey: child.label!)
+          }
+          if child.value is Bool{
+            aCoder.encodeBool(child.value as! Bool, forKey: child.label!)
+          }
+        }
+      }
+      mirror = mirror.superclassMirror()!
+    }while String(mirror.subjectType).hasPrefix("AHN")
+  }
+  
+  public required init?(coder aDecoder: NSCoder) {
+    super.init(functionName: "normalMapModifier")
+    usesMPS = true
+    var mirror = Mirror(reflecting: self.dynamicType.init())
+    repeat{
+      for child in mirror.children{
+        if allowableControls.contains(child.label!){
+          if child.value is Int{
+            let val = aDecoder.decodeIntegerForKey(child.label!)
+            setValue(val, forKey: child.label!)
+          }
+          if child.value is Float{
+            let val = aDecoder.decodeFloatForKey(child.label!)
+            setValue(val, forKey: child.label!)
+          }
+          if child.value is Bool{
+            let val = aDecoder.decodeBoolForKey(child.label!)
+            setValue(val, forKey: child.label!)
+          }
+        }
+      }
+      mirror = mirror.superclassMirror()!
+    }while String(mirror.subjectType).hasPrefix("AHN")
   }
 }

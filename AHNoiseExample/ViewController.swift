@@ -14,8 +14,9 @@ class ViewController: UIViewController {
     super.viewDidLoad()
     
     // Creates a wood effect
-    let context = AHNContext()
-    let simplex = AHNGeneratorSimplex(context: context, textureWidth: 1024, textureHeight: 1024, use4DNoise: false, mapForSphere: false, makeSeamless: false)
+    let simplex = AHNGeneratorSimplex()
+    simplex.textureWidth = 1024
+    simplex.textureHeight = 1024
     simplex.octaves = 2
     simplex.frequency = 4
     
