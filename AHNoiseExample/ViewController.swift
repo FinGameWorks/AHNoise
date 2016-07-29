@@ -20,28 +20,48 @@ class ViewController: UIViewController {
     simplex.octaves = 2
     simplex.frequency = 4
     
-    let loop = AHNModifierLoop(input: simplex, loopEvery: 0.2)
+    let loop = AHNModifierLoop()
+    loop.provider = simplex
+    loop.boundary = 0.5
     loop.normalise = true
     
-    let shift = AHNModifierScaleBias(input: loop, scale: 0.6, bias: 0.4)
+    let shift = AHNModifierScaleBias()
+    shift.provider = loop
+    shift.scale = 0.6
+    shift.bias = 0.4
     
-    
+
     // Create the grain
-    let grain = AHNGeneratorSimplex(context: context, textureWidth: 1024, textureHeight: 1024, use4DNoise: false, mapForSphere: false, makeSeamless: false)
+    let grain = AHNGeneratorSimplex()
+    grain.textureWidth = 1024
+    grain.textureHeight = 1024
     grain.frequency = 100
     
-    let stretch = AHNModifierStretch(input: grain, xStretchFactor: 1, yStretchFactor: 70)
+    let stretch = AHNModifierStretch()
+    stretch.provider = grain
+    stretch.yFactor = 30
     
     
     // Combine them
-    let multiply = AHNCombinerMultiply(input1: shift, input2: stretch)
+    let multiply = AHNCombinerMultiply()
+    multiply.provider = shift
+    multiply.provider2 = stretch
     
     // Make a brown constant colour and add it
-    let brown = AHNGeneratorConstant(context: context, textureWidth: 1024, textureHeight: 1024, red: 0.6, green: 0.4, blue: 0.3)
+    let brown = AHNGeneratorConstant()
+    brown.textureWidth = 1024
+    brown.textureHeight = 1024
+    brown.red = 0.6
+    brown.green = 0.4
+    brown.blue = 0.3
     
-    let combine = AHNCombinerMultiply(input1: brown, input2: multiply)
+    let combine = AHNCombinerMultiply()
+    combine.provider = brown
+    combine.provider2 = multiply
     
-    let stretch2 = AHNModifierStretch(input: combine, xStretchFactor: 1, yStretchFactor: 4	)
+    let stretch2 = AHNModifierStretch()
+    stretch2.provider = combine
+    stretch2.yFactor = 4
     
     let imageView = UIImageView(frame: view.bounds)
     view.addSubview(imageView)

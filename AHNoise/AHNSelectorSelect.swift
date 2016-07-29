@@ -25,7 +25,6 @@ public class AHNSelectorSelect: AHNSelector {
   
   // MARK:- Properties
   
-  var allowableControls: [String] = ["transition", "boundary"]
   
   /** 
    The amount the transition between the two inputs should be softened `(0.0 - 1.0)`.
@@ -92,65 +91,5 @@ public class AHNSelectorSelect: AHNSelector {
     
     // Set the buffer in the argument table
     commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
-  }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  // MARK:- NSCoding
-  public func encodeWithCoder(aCoder: NSCoder) {
-    var mirror = Mirror(reflecting: self)
-    repeat{
-      for child in mirror.children{
-        if allowableControls.contains(child.label!){
-          if child.value is Int{
-            aCoder.encodeInteger(child.value as! Int, forKey: child.label!)
-          }
-          if child.value is Float{
-            aCoder.encodeFloat(child.value as! Float, forKey: child.label!)
-          }
-          if child.value is Bool{
-            aCoder.encodeBool(child.value as! Bool, forKey: child.label!)
-          }
-        }
-      }
-      mirror = mirror.superclassMirror()!
-    }while String(mirror.subjectType).hasPrefix("AHN")
-  }
-  
-  public required init?(coder aDecoder: NSCoder) {
-    super.init(functionName: "selectSelector")
-    var mirror = Mirror(reflecting: self.dynamicType.init())
-    repeat{
-      for child in mirror.children{
-        if allowableControls.contains(child.label!){
-          if child.value is Int{
-            let val = aDecoder.decodeIntegerForKey(child.label!)
-            setValue(val, forKey: child.label!)
-          }
-          if child.value is Float{
-            let val = aDecoder.decodeFloatForKey(child.label!)
-            setValue(val, forKey: child.label!)
-          }
-          if child.value is Bool{
-            let val = aDecoder.decodeBoolForKey(child.label!)
-            setValue(val, forKey: child.label!)
-          }
-        }
-      }
-      mirror = mirror.superclassMirror()!
-    }while String(mirror.subjectType).hasPrefix("AHN")
   }
 }

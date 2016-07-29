@@ -116,7 +116,6 @@ public class AHNSelector: NSObject, AHNTextureProvider{
   }
 
   
-  public var modName: String = ""
   
   
   

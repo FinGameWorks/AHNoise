@@ -23,8 +23,6 @@ struct WaveInputs {
 ///*Conforms to the `AHNTextureProvider` protocol.*
 public class AHNGeneratorWave: AHNGenerator  {
   
-  var allowableControls: [String] = ["textureWidth", "textureHeight", "frequency", "offsetStrength", "xRotation", "yRotation", "zRotation"]
-  
   
   // MARK:- Properties
   
@@ -79,62 +77,5 @@ public class AHNGeneratorWave: AHNGenerator  {
     memcpy(uniformBuffer!.contents(), &uniforms, strideof(WaveInputs))
     
     commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
-  }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  // MARK:- NSCoding
-  public func encodeWithCoder(aCoder: NSCoder) {
-    var mirror = Mirror(reflecting: self)
-    repeat{
-      for child in mirror.children{
-        if allowableControls.contains(child.label!){
-          if child.value is Int{
-            aCoder.encodeInteger(child.value as! Int, forKey: child.label!)
-          }
-          if child.value is Float{
-            aCoder.encodeFloat(child.value as! Float, forKey: child.label!)
-          }
-          if child.value is Bool{
-            aCoder.encodeBool(child.value as! Bool, forKey: child.label!)
-          }
-        }
-      }
-      mirror = mirror.superclassMirror()!
-    }while String(mirror.subjectType).hasPrefix("AHN")
-  }
-  
-  public required init?(coder aDecoder: NSCoder) {
-    super.init(functionName: "waveGenerator")
-    var mirror = Mirror(reflecting: self.dynamicType.init())
-    repeat{
-      for child in mirror.children{
-        if allowableControls.contains(child.label!){
-          if child.value is Int{
-            let val = aDecoder.decodeIntegerForKey(child.label!)
-            setValue(val, forKey: child.label!)
-          }
-          if child.value is Float{
-            let val = aDecoder.decodeFloatForKey(child.label!)
-            setValue(val, forKey: child.label!)
-          }
-          if child.value is Bool{
-            let val = aDecoder.decodeBoolForKey(child.label!)
-            setValue(val, forKey: child.label!)
-          }
-        }
-      }
-      mirror = mirror.superclassMirror()!
-    }while String(mirror.subjectType).hasPrefix("AHN")
-  }
+  }  
 }

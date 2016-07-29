@@ -27,11 +27,6 @@ public class AHNModifierScaleBias: AHNModifier {
   
   // MARK:- Properties
   
-  var allowableControls: [String] = ["scale", "bias"]
-
-  
-  
-  
   
   ///The multiplier to apply to the `input` value before the addition of `bias`. Default value is `1.0`.
   public var scale: Float = 1{
@@ -98,64 +93,5 @@ public class AHNModifierScaleBias: AHNModifier {
     memcpy(uniformBuffer!.contents(), &uniforms, strideof(vector_float2))
     
     commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
-  }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  // MARK:- NSCoding
-  public func encodeWithCoder(aCoder: NSCoder) {
-    var mirror = Mirror(reflecting: self)
-    repeat{
-      for child in mirror.children{
-        if allowableControls.contains(child.label!){
-          if child.value is Int{
-            aCoder.encodeInteger(child.value as! Int, forKey: child.label!)
-          }
-          if child.value is Float{
-            aCoder.encodeFloat(child.value as! Float, forKey: child.label!)
-          }
-          if child.value is Bool{
-            aCoder.encodeBool(child.value as! Bool, forKey: child.label!)
-          }
-        }
-      }
-      mirror = mirror.superclassMirror()!
-    }while String(mirror.subjectType).hasPrefix("AHN")
-  }
-  
-  public required init?(coder aDecoder: NSCoder) {
-    super.init(functionName: "scaleBiasModifier")
-    var mirror = Mirror(reflecting: self.dynamicType.init())
-    repeat{
-      for child in mirror.children{
-        if allowableControls.contains(child.label!){
-          if child.value is Int{
-            let val = aDecoder.decodeIntegerForKey(child.label!)
-            setValue(val, forKey: child.label!)
-          }
-          if child.value is Float{
-            let val = aDecoder.decodeFloatForKey(child.label!)
-            setValue(val, forKey: child.label!)
-          }
-          if child.value is Bool{
-            let val = aDecoder.decodeBoolForKey(child.label!)
-            setValue(val, forKey: child.label!)
-          }
-        }
-      }
-      mirror = mirror.superclassMirror()!
-    }while String(mirror.subjectType).hasPrefix("AHN")
   }
 }

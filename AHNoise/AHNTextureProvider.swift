@@ -71,31 +71,9 @@ public protocol AHNTextureProvider: class{
   
   
   
-  func isKindOfClass(aClass: AnyClass) -> Bool
-  
-  
-  
-  func valueForKey(key: String) -> AnyObject?
-  
-  
-  
-  func setValue(value: AnyObject?, forKey key: String)
-  
-  
-  
-  
-  
   ///- returns: `True` if the object has enough inputs to provide an output.
   func canUpdate() -> Bool
   
-  
-  func clone() -> AHNTextureProvider
-  
-  
-  func code() -> String
-  
-  
-  var modName: String { get set }
   
   
   /**
@@ -107,6 +85,7 @@ public protocol AHNTextureProvider: class{
   func greyscaleValuesAtPositions(positions: [CGPoint]) -> [Float]
   
   
+  
   /**
    Returns the colour values in the texture for specified positions, useful for using the texture as a heightmap.
    
@@ -115,6 +94,7 @@ public protocol AHNTextureProvider: class{
    */
   func colourValuesAtPositions(positions: [CGPoint]) -> [(red: Float, green: Float, blue: Float, alpha: Float)]
 
+  
   
   ///- returns: All points in the texture, use this as the input parameter for `colourValuesAtPositions` or `greyscaleValuesAtPositions` to return the values for the whole texture.
   func allTexturePositions() -> [CGPoint]
@@ -149,203 +129,6 @@ extension AHNTextureProvider{
     guard let texture = texture() else { return nil }
     return UIImage.imageWithMTLTexture(texture)
   }
-  
-  
-  
-  // Module name in title case
-  public func moduleName() -> String{
-    var str = "\(Mirror(reflecting: self).subjectType)"
-    
-    if str.hasPrefix("AHN"){
-      for _ in 0..<3{
-        str.removeAtIndex(str.startIndex)
-      }
-    }
-    
-    str = str.titleCase()
-    var retVal = ""
-    let split = str.componentsSeparatedByString(" ")
-    for i in 0..<split.count{
-      if i != 0 { retVal += " " }
-      retVal += split[(split.count-1)-i]
-    }
-    
-    return retVal
-  }
-  
-  
-  public func clone() -> AHNTextureProvider{
-    if let colour = self as? AHNModifierColour{
-      return colour.clone()
-    }
-    let clone = self.dynamicType.init()
-    guard let mod = self as? Moduleable, let obj = self as? NSObject , objclone = clone as? NSObject else { return clone }
-    
-    for property in mod.allowableControls{
-      objclone.setValue(obj.valueForKey(property), forKey: property)
-    }
-    return clone
-  }
-  
-  
-  public func code() -> String{
-    
-    guard let obj = self as? NSObject else { return "error" }
-    
-    // Duplicate for testing against
-    let duplicate = self.dynamicType.init()
-    guard let duplicateObj = duplicate as? NSObject else { return "error" }
-    var retString = ""
-    let className = obj.className
-    
-    // Add input code
-    if let generator = self as? AHNGenerator{
-      if let provider = generator.xoffsetInput{
-        retString += provider.code()
-      }
-      if let provider2 = generator.yoffsetInput{
-        retString += provider2.code()
-      }
-    }
-    if let modifier = self as? AHNModifier{
-      if let provider = modifier.provider{
-        retString += provider.code()
-      }
-    }
-    if let modifier = self as? AHNModifierMapNormal{
-      if let provider = modifier.provider{
-        retString += provider.code()
-      }
-    }
-    if let modifier = self as? AHNModifierScaleCanvas{
-      if let provider = modifier.provider{
-        retString += provider.code()
-      }
-    }
-    if let combiner = self as? AHNCombiner{
-      if let provider = combiner.provider{
-        retString += provider.code()
-      }
-      if let provider2 = combiner.provider2{
-        retString += provider2.code()
-      }
-    }
-    if let selector = self as? AHNSelector{
-      if let provider = selector.provider{
-        retString += provider.code()
-      }
-      if let provider2 = selector.provider2{
-        retString += provider2.code()
-      }
-      if let select = selector.selector{
-        retString += select.code()
-      }
-    }
-    
-    // Add init
-    retString += "let \(modName) = \(className)()\n"
-    if let mod = self as? Moduleable {
-      
-      // Set providers
-      if let generator = self as? AHNGenerator{
-        if let provider = generator.xoffsetInput{
-          retString += "\(modName).xoffsetInput = \(provider.modName)\n"
-        }
-        if let provider = generator.yoffsetInput{
-          retString += "\(modName).yoffsetInput = \(provider.modName)\n"
-        }
-      }
-      if let modifier = self as? AHNModifier{
-        if let provider = modifier.provider{
-          retString += "\(modName).provider = \(provider.modName)\n"
-        }
-      }
-      if let modifier = self as? AHNModifierMapNormal{
-        if let provider = modifier.provider{
-          retString += "\(modName).provider = \(provider.modName)\n"
-        }
-      }
-      
-      if let modifier = self as? AHNModifierScaleCanvas{
-        if let provider = modifier.provider{
-          retString += "\(modName).provider = \(provider.modName)\n"
-        }
-      }
-      if let combiner = self as? AHNCombiner{
-        if let provider = combiner.provider{
-          retString += "\(modName).provider = \(provider.modName)\n"
-        }
-        if let provider2 = combiner.provider2{
-          retString += "\(modName).provider2 = \(provider2.modName)\n"
-        }
-      }
-      if let selector = self as? AHNSelector{
-        if let provider = selector.provider{
-          retString += "\(modName).provider = \(provider.modName)\n"
-        }
-        if let provider2 = selector.provider2{
-          retString += "\(modName).provider2 = \(provider2.modName)\n"
-        }
-        if let select = selector.selector{
-          retString += "\(modName).selector = \(select.modName)\n"
-        }
-      }
-      
-      // Set the rest of the properties
-      for property in mod.allowableControls{
-        
-        // Get the property for the object and default duplicate
-        let val = obj.valueForKey(property)
-        let duplicateVal = duplicateObj.valueForKey(property)
-        
-        // Convert to string
-        var strVal = "\(val)"
-        let duplicateStrVal = "\(duplicateVal)"
-        
-        // If they are the same then no need to set value
-        if strVal == duplicateStrVal { continue }
-        
-        // String for Booleans
-        let booleanProperties = ["seamless", " sitesVisible", "cutEdges", "normalise"]
-        if booleanProperties.contains(property){
-          strVal = val as! Int == 1 ? "true" : "false"
-        }
-        
-        if strVal.containsString("Optional"){
-          strVal = strVal.stringByReplacingOccurrencesOfString("Optional(", withString: "")
-          strVal = strVal.stringByReplacingOccurrencesOfString(")", withString: "")
-        }
-        retString += "\(modName).\(property) = \(strVal)\n"
-      }
-    }else{
-      
-      // For colour coding
-      if let colour = self as? AHNModifierColour{
-        
-        // Set provider
-        if let provider = colour.provider{
-          retString += "\(modName).provider = \(provider.modName)\n"
-        }
-        
-        // Empty string to enter tuple code into
-        var coloursTupleString = "["
-        
-        // For colour components
-        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
-        for (i, tuple) in colour.colours.enumerate(){
-          if i != 0{
-            coloursTupleString += ", "
-          }
-          tuple.colour.getRed(&r, green: &g, blue: &b, alpha: &a)
-          coloursTupleString += "(colour: UIColor(red: \(r), green: \(g), blue: \(b), alpha: 1.0), position: \(tuple.position), intensity: \(tuple.intensity))"
-        }
-        coloursTupleString += "]"
-        retString += "\(modName).colours = \(coloursTupleString)\n"
-      }
-    }
-    return retString + "\n"
-  }
-  
   
   
   

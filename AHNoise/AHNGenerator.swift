@@ -132,7 +132,6 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
       dirty = true
     }
   }
-  public var modName: String = ""
   
   
   

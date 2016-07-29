@@ -21,8 +21,6 @@ import MetalKit
  */
 public class AHNModifierMapNormal: NSObject, AHNTextureProvider {
   
-  var allowableControls: [String] = ["intensity", "smoothing"]
-
   
   // MARK:- Properties
   
@@ -89,7 +87,6 @@ public class AHNModifierMapNormal: NSObject, AHNTextureProvider {
     }
   }
 
-  public var modName: String = ""
   
   
   
@@ -206,66 +203,5 @@ public class AHNModifierMapNormal: NSObject, AHNTextureProvider {
   ///- returns: `False` if the `provider` property is not set.
   public func canUpdate() -> Bool {
     return provider != nil
-  }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  // MARK:- NSCoding
-  public func encodeWithCoder(aCoder: NSCoder) {
-    var mirror = Mirror(reflecting: self)
-    repeat{
-      for child in mirror.children{
-        if allowableControls.contains(child.label!){
-          if child.value is Int{
-            aCoder.encodeInteger(child.value as! Int, forKey: child.label!)
-          }
-          if child.value is Float{
-            aCoder.encodeFloat(child.value as! Float, forKey: child.label!)
-          }
-          if child.value is Bool{
-            aCoder.encodeBool(child.value as! Bool, forKey: child.label!)
-          }
-        }
-      }
-      mirror = mirror.superclassMirror()!
-    }while String(mirror.subjectType).hasPrefix("AHN")
-  }
-  
-  public required init?(coder aDecoder: NSCoder) {
-    context = AHNContext.SharedContext
-
-    super.init()
-    var mirror = Mirror(reflecting: self.dynamicType.init())
-    repeat{
-      for child in mirror.children{
-        if allowableControls.contains(child.label!){
-          if child.value is Int{
-            let val = aDecoder.decodeIntegerForKey(child.label!)
-            setValue(val, forKey: child.label!)
-          }
-          if child.value is Float{
-            let val = aDecoder.decodeFloatForKey(child.label!)
-            setValue(val, forKey: child.label!)
-          }
-          if child.value is Bool{
-            let val = aDecoder.decodeBoolForKey(child.label!)
-            setValue(val, forKey: child.label!)
-          }
-        }
-      }
-      mirror = mirror.superclassMirror()!
-    }while String(mirror.subjectType).hasPrefix("AHN")
   }
 }

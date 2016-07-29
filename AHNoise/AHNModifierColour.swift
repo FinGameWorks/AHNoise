@@ -19,7 +19,7 @@ import simd
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNModifierColour: AHNModifier, NSCoding {
+public class AHNModifierColour: AHNModifier {
 
   
   // MARK:- Properties
@@ -256,45 +256,5 @@ public class AHNModifierColour: AHNModifier, NSCoding {
   ///Remove all colours.
   public func removeAllColours(){
     colours = []
-  }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  // MARK:- NSCoding
-  public func encodeWithCoder(aCoder: NSCoder) {
-    aCoder.encodeObject(_colours, forKey: "colours")
-    aCoder.encodeObject(_positions, forKey: "positions")
-    aCoder.encodeObject(_intensities, forKey: "intensities")
-  }
-  
-  public required init?(coder aDecoder: NSCoder) {
-    _colours = aDecoder.decodeObjectForKey("colours") as! [UIColor]
-    _positions = aDecoder.decodeObjectForKey("positions") as! [Float]
-    _intensities = aDecoder.decodeObjectForKey("intensities") as! [Float]
-    super.init(functionName: "colourModifier")
-  }
-  
-  
-  public func clone() -> AHNTextureProvider {
-    let clone = AHNModifierColour()
-    var tuples: [(colour: UIColor, position: Float, intensity: Float)] = []
-    for tuple in colours{
-      tuples.append((tuple.colour.copy() as! UIColor, tuple.position, tuple.intensity))
-    }
-    clone.colours = tuples
-    
-    return clone
   }
 }

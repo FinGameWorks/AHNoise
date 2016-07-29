@@ -92,7 +92,6 @@ public class AHNModifier: NSObject, AHNTextureProvider {
   
   
   
-  public var modName: String = ""
   
   
   
