@@ -3,51 +3,44 @@
 
 ***
 
-### Overview
-Most of the classes in `AHNoise` will output a texture that can either be used as the input to another class, or converted into a `UIImage` for use. The only class that does not output a texture is `AHNContext`, which is a wrapper for the `Metal` classes used to communicate with the GPU. All other classes will output a texture by calling the `texture()` function. Most of the other classes will also allow an input texture to modify in some way. It is only `AHNGenerator` subclasses as well as the `AHNContext` class that have no input. `AHNModifier`s have one texture input and one texture output, `AHNCombiner`s have two texture inputs and one texture output and `AHNSelector`s have three texture inputs and one texture output. Each subclass has various tools and properties to modify behaviour too.
+###Introduction
+Cohesive, procedural noise can be used to add natural looking unevenness to a texture. This library provides the tools required to generate procedural noise and modify it all on the GPU using Metal and Swift. It is similar in functionality to Apple’s own `GameplayKit` noise framework released in iOS 10, as both have taken inspiration from the libnoise framework that has not been supported for some time now. There are some discrepancies between this framework and `GameplayKit`, most notably the extremely different outputs from the respective “Billow” generators and the lack of curve remapping. The only other major difference in capability is in the speed that a noise texture is generated. The `GameplayKit` noise generation can take a few seconds for a simple Perlin/Simplex texture at 512x512px, whereas this framework can calculate multiple textures a second as demonstrated in the Noise Studio App, built to demonstrate and act as a tool for using this noise library.
+
+###Library Overview
+Most of the classes in `AHNoise` will output a texture that can either be used as the input to another class, or converted into a `UIImage` for use. The only class that does not output a texture is `AHNContext`, which is a wrapper for the Metal classes used to communicate with the GPU. All other classes will output a texture by calling the `texture()` function. Most of the other classes will also allow an input texture to modify in some way. It is only `AHNGenerator` subclasses as well as the `AHNContext` class that have no input. `AHNModifiers` have one texture input and one texture output, `AHNCombiners` have two texture inputs and one texture output and `AHNSelectors` have three texture inputs and one texture output. Each subclass has various tools and properties to modify behaviour too.
+
+All classes in this module are prefixed with “AHN”. This is then split into categories such as `AHNGenerator`, `AHNModifier`, `AHNCombiner` and `AHNSelector`. These are superclasses designed to be subclassed into usable modules such as `AHNGeneratorSimplex` or `AHNCombinerMultiply` etc. The idea being that by starting to type “AHN” you are a presented with a list of all classes which can then be narrowed down as you continue to type.
+
+All texture generation and modification is carried out on the GPU. A module will populate its `texture()` property which can then be handed to another module which will then use it in its own GPU based calculations. This provides a very simple modular approach, though the downside is that when chaining together a large number of modules, texture memory is being copied to and from the GPU multiple times, which is not the most efficient means of creating a texture though it is a sacrifice made to enable the versatility of the framework.
+
+The noise calculations output a value in the range -1.0 to 1.0. This is mapped to the RGB range 0.0 to 1.0 with 0.0 being black and 1.0 white. The only exception to this is the `AHNModifierAbsolute` class that performs its calculations before the range is remapped to enable the `abs()` function to have an effect.  Where colour is used, it is sometimes necessary to average the RGB components to greyscale in order to perform calculations, so it is advisable to carry out any colourising of textures at the end of module chains.
 
 
-### Navigation
-All classes in this module are prefixed with `AHN`. This is then split into categories such as `AHNGenerator`, `AHNModifier`, `AHNCombiner` and `AHNSelector`. These are superclasses designed to be subclassed into usable modules such as `AHNGeneratorSimplex` or `AHNCombinerMultiply` etc. The idea being that by starting to type `AHN` you are a presented with a list of all classes which can then be narrowed down as you continue to type.
+###How to Use
+Chains must start with an `AHNGenerator` subclass to create the initial texture. These classes require input but output a texture, such as simplex noise.
 
+    let simplex = AHNGeneratorSimplex()
 
-### Usage
-The first thing that needs to be created is an `AHNContext`.
-
-`let context = AHNContext()`
-
-You can define a specific `MTLDevice` to use in the initialiser, but it is not necessary. You should only need to create one `AHNContext`.
-
-You can then use the `context` to create an `AHNGenerator` subclass. These classes have no input but output a texture, such as simplex noise. All module chains will start with one of these subclasses.
-
-`let simplex = AHNGeneratorSimplex(context: context, textureWidth: 1024, textureHeight: 1024, use4DNoise: false, mapForSphere: false, makeSeamless: false)`
-
-- The `textureWidth` and `textureHeight` parameters are the width and height of the output texture in pixels.
-- The `use4DNoise` parameter dictates which version of simplex noise to use. 4D is more complex and computationally expensive but provides an extra degree of freedom with which to edit noise.
-- The `mapForSphere` parameter maps the noise in such a way that it can be seamlessly wrapped onto a sphere with no warping.
-- The `makeSeamless` parameter allows the output texture to be tiled seamlessly together, with no evident borders.
-
-The generators also have properties such as `octaves`, `frequency`, `lacunarity` and `persistence` which all modify the output in various ways that are mentioned in the class markup. Most important of the four is `octaves` which compounds several layers of noise together. The default of `8` is a good start but higher values provide more detailed noise at a computational cost. The `frequency` parameters the next most important as it provides denser noise for higher values. The other two effect the interaction of the `frequency` for each of the compounded layers at each octave.
-
-There are also parameters to move the texture around in "noise space" to provide variable output. You can animate noise by continuously varying the `zValue`, or make the texture appear to "crawl" by altering the `position` property. This obviously incurs a computational cost.
-
+The details of class properties are discussed in detail in the documentation.
 With the fist noise module ready it can either be directly turned into a `UIImage`:
 
-`let image = simplex.uiImage()`
+    let image = simplex.uiImage()
 
-Otherwise it can be used as the input to another `AHNoise` module. For example it can have it's values clamped:
+Otherwise it can be used as the input to another AHNoise module. For example it can have its values clamped:
 
-`let clamp = AHNModifierClamp(input: simplex, min: 0.3, max: 0.8)`
+    let clamp = AHNModifierClamp()
+    clamp.input = simplex
+    clamp.min = 0.3
+    clamp.max = 0.8
 
-This will clamp the RGB values to 0.3 and 0.8.
+This will clamp the noise values to 0.3 and 0.8.
+There are also modules that accept two or three inputs. These are called `AHNCombiners` and `AHNSelectors` respectively. All `AHNGenerator`, `AHNModifier`, `AHNCombiner` and `AHNSelector` classes conform to the `AHNTextureProvider` protocol, which is the type used to provide input to a module. It is also the type that provides the `uiImage()` function to convert the underlying noise texture into a usable `UIImage`. A `UIImage` can then be converted into an `SKTexture` if necessary for use in gaming.
 
-All classes have been marked up with them to explain how they work.
+
+All classes have been marked up.
 
 The example included shows how to generate a wood texture in only a few lines of code.
 
-### A Note on Noise and Colour Space
-Perhaps the most confusing thing in the markup is the comparison of "Noise Space" and "Colour Space". The difference is that the simplex algorithm outputs values in the range -1.0 to 1.0, whereas RGB values need to be in the range 0.0 to 1.0. The two are mapped together linearly using the formula `colour = (noise/2)+0.5`. In the markup the colour values appear in square brackets `[0.5]`, and each module dictates which space it works in where needed. Most of the time you won't need to know the difference but it helps to understand where differences arise. Both values are retained as some classes such as `AHNModifierAbsolute` would have no effect on a range of 0.0 to 1.0, whereas others such as `AHNCombinerMultiply` would result in negative values if noises space were used.
-
 
 ### Documentation
-Full documentation is on the way. But for now the markup is enough to get started.
+Full documentation is included as a pdf.
