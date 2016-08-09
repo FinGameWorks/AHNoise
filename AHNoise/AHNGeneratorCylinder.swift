@@ -50,7 +50,7 @@ public class AHNGeneratorCylinder: AHNGenerator {
   
   
   
-  ///The position along the x axis that the cylinders are centred on. A value of `0.0` corresponds to the left texture edge, and a value of `1.0` cooresponds to the right texture edge. The default value is `0.5`.
+  ///The position along the x axis that the cylinders are centred on. A value of `0.0` corresponds to the left texture edge, and a value of `1.0` corresponds to the right texture edge. The default value is `0.5`.
   public var xPosition: Float = 0.5{
     didSet{
       dirty = true
@@ -59,7 +59,7 @@ public class AHNGeneratorCylinder: AHNGenerator {
   
   
   
-  ///The position along the y axis that the cylinders are centred on. A value of `0.0` corresponds to the bottom texture edge, and a value of `1.0` cooresponds to the top texture edge. The default value is `0.5`.
+  ///The position along the y axis that the cylinders are centred on. A value of `0.0` corresponds to the bottom texture edge, and a value of `1.0` corresponds to the top texture edge. The default value is `0.5`.
   public var yPosition: Float = 0.5{
     didSet{
       dirty = true

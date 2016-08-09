@@ -42,7 +42,7 @@ public class AHNGeneratorBillow: AHNGeneratorCoherent {
   
   ///Encodes the required uniform values for this `AHNGenerator` subclass. This should never be called directly.
   override public func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = CoherentInputs(pos: vector_float2(xValue, yValue), rotations: vector_float3(xRotation, yRotation, zRotation), octaves: Int32(octaves), persistance: persistance, frequency: frequency, lacunarity: lacunarity,  zValue: zValue, wValue: wValue, offsetStrength: offsetStrength, use4D: Int32(use4D || seamless || sphereMap ? 1 : 0), sphereMap: Int32(sphereMap ? 1 : 0), seamless: Int32(seamless ? 1 : 0))
+    var uniforms = CoherentInputs(pos: vector_float2(xValue, yValue), rotations: vector_float3(xRotation, yRotation, zRotation), octaves: Int32(octaves), persistence: persistence, frequency: frequency, lacunarity: lacunarity,  zValue: zValue, wValue: wValue, offsetStrength: offsetStrength, use4D: Int32(use4D || seamless || sphereMap ? 1 : 0), sphereMap: Int32(sphereMap ? 1 : 0), seamless: Int32(seamless ? 1 : 0))
     
     if uniformBuffer == nil{
       uniformBuffer = context.device.newBufferWithLength(strideof(CoherentInputs), options: .CPUCacheModeDefaultCache)

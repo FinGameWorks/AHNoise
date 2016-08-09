@@ -32,7 +32,7 @@ public protocol AHNTextureProvider: class{
   
   
   
-  ///- returns: A UIImage created from the output `MTLTexture` provided by the `texture()` function.
+  ///- returns: A `UIImage` created from the output `MTLTexture` provided by the `texture()` function.
   func uiImage() -> UIImage?
   
   
@@ -87,7 +87,7 @@ public protocol AHNTextureProvider: class{
   
   
   /**
-   Returns the colour values in the texture for specified positions, useful for using the texture as a heightmap.
+   Returns the colour values in the texture for specified positions.
    
    - parameter positions: The 2D positions in the texture for which to return colour values for red, green, blue and alpha between `0.0 - 1.0`.
    - returns: The colour values between `0.0 - 1.0` for the specified pixel locations.

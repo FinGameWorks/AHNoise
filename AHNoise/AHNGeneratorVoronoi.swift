@@ -16,7 +16,7 @@ struct VoronoiInputs {
   var offsetStrength: Float
   var rotations: vector_float3
   var octaves: Int32
-  var persistance: Float
+  var persistence: Float
   var frequency: Float
   var lacunarity: Float
   var zValue: Float
@@ -59,7 +59,7 @@ public class AHNGeneratorVoronoi: AHNGeneratorCoherent {
   
   ///Encodes the required uniform values for this `AHNGenerator` subclass. This should never be called directly.
   override public func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = VoronoiInputs(pos: vector_float2(xValue, yValue), offsetStrength: offsetStrength, rotations: vector_float3(xRotation, yRotation, zRotation), octaves: Int32(octaves), persistance: persistance, frequency: frequency, lacunarity: lacunarity, zValue: zValue, wValue: wValue, sphereMap: sphereMap ? 1 : 0, seamless: seamless ? 1 : 0)
+    var uniforms = VoronoiInputs(pos: vector_float2(xValue, yValue), offsetStrength: offsetStrength, rotations: vector_float3(xRotation, yRotation, zRotation), octaves: Int32(octaves), persistence: persistence, frequency: frequency, lacunarity: lacunarity, zValue: zValue, wValue: wValue, sphereMap: sphereMap ? 1 : 0, seamless: seamless ? 1 : 0)
     if uniformBuffer == nil{
       uniformBuffer = context.device.newBufferWithLength(strideof(VoronoiInputs), options: .CPUCacheModeDefaultCache)
     }

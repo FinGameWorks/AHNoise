@@ -30,7 +30,7 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   
   
-  ///The `MTLBuffer` used to transfer the constant values used by the compute kernel to the GPU.
+  ///The `MTLBuffer` used to communicate the constant values used by the compute kernel to the GPU.
   public var uniformBuffer: MTLBuffer?
   
   

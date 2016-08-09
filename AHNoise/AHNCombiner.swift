@@ -108,32 +108,6 @@ public class AHNCombiner: NSObject, AHNTextureProvider {
   
   
   
-  ///The first input that will be combined with `provider2` to provide the output.
-  public weak var input1: AHNTextureProvider?{
-    get{
-      return provider
-    }
-    set{
-      provider = newValue
-      dirty = true
-    }
-  }
-  
-  
-  
-  ///The second input that will be combined with `provider` to provide the output.
-  public weak var input2: AHNTextureProvider?{
-    get{
-      return provider2
-    }
-    set{
-      provider2 = newValue
-      dirty = true
-    }
-  }
-  
-  
-  
   
   
   

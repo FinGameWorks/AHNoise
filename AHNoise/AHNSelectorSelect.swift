@@ -14,7 +14,7 @@ import simd
 /**
  Selects one of two input `AHNTextureProvider`s to write to the output using a weight from a third input `AHNTextureProvider` used as the `selector`.
  
- The input `AHNTextureProvider`s may range from a value of `0.0 - 1.0`. This value is taken from the `selector` `AHNTextureProvider` for each pixel to select which input to write to the output `MTLTexture`. A `selector` value between `0.0 - 0.5` will result in `provider` being written to the output, whereas a `selector` value between `0.5 - 1.0` will result in `provider2` being written to the output. `selector` values equal to `0.0` will always write `provider` to the output.
+ The input `AHNTextureProvider`s may range from a value of `0.0 - 1.0`. This value is taken from the `selector` `AHNTextureProvider` for each pixel to select which input to write to the output `MTLTexture`. A `selector` value between `0.0 - boundary` will result in `provider` being written to the output, whereas a `selector` value between `boundary - 1.0` will result in `provider2` being written to the output.
  
  The `edgeTransition` property is used to define how abruptly the transition occurs between the two inputs. A value of `0.0` will result in no transition. Higher values cause the transition to be softened by interpolating between the two inputs at the border between them. A maximum value of `1.0` results in the edge transition covering the whole of the two inputs.
  
@@ -41,7 +41,7 @@ public class AHNSelectorSelect: AHNSelector {
   
   
   
-  ///The boundary that the selector value is compared to. Values larger than this boundary will output `provider2`, and less than this will output `provider`. The default value is `0.5`.
+  ///The boundary that the selector value is compared to. Selector values larger than this boundary will output `provider2`, and less than this will output `provider`. The default value is `0.5`.
   var boundary: Float = 0.5{
     didSet{
       dirty = true

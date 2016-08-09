@@ -351,7 +351,7 @@ struct VoronoiInputs {
   float2 offsetStrength;
   float3 rotations;
   int octaves;
-  float persistance;
+  float persistence;
   float frequency;
   float lacunarity;
   float zValue;
@@ -468,7 +468,7 @@ kernel void voronoiGenerator(texture2d<float, access::write> outTexture [[textur
   int octaves = uniforms.octaves;
   float freq = uniforms.frequency;
   float lacunarity = uniforms.lacunarity;
-  float persistance = uniforms.persistance;
+  float persistence = uniforms.persistence;
   int seamless = uniforms.seamless;
   int sphereMap = uniforms.sphereMap;
   
@@ -501,7 +501,7 @@ kernel void voronoiGenerator(texture2d<float, access::write> outTexture [[textur
     
     freq *= lacunarity;
     maxAmplitude += amplitude;
-    amplitude *= persistance;
+    amplitude *= persistence;
   }
   
   float r = total / maxAmplitude;
@@ -539,7 +539,7 @@ struct CoherentInputs{
   float2 pos;
   float3 rotations;
   int octaves;
-  float persistance;
+  float persistence;
   float frequency;
   float lacunarity;
   float z;
@@ -570,7 +570,7 @@ kernel void simplexGenerator(texture2d<float, access::write> outTexture [[textur
   int octaves = uniforms.octaves;
   float freq = uniforms.frequency;
   float lacunarity = uniforms.lacunarity;
-  float persistance = uniforms.persistance;
+  float persistence = uniforms.persistence;
   float x = uniforms.pos.x + (float(gid.x)/float(threads.x)) + (grey(xoffset.read(gid)) * disStren);
   float y = uniforms.pos.y + (float(gid.y)/float(threads.y)) + (grey(yoffset.read(gid)) * disStren);
   float z = uniforms.z;
@@ -613,7 +613,7 @@ kernel void simplexGenerator(texture2d<float, access::write> outTexture [[textur
     
     freq *= lacunarity;
     maxAmplitude += amplitude;
-    amplitude *= persistance;
+    amplitude *= persistence;
   }
   
   float r = total / maxAmplitude;
@@ -641,7 +641,7 @@ kernel void billowGenerator(texture2d<float, access::write> outTexture [[texture
   int octaves = uniforms.octaves;
   float freq = uniforms.frequency;
   float lacunarity = uniforms.lacunarity;
-  float persistance = uniforms.persistance;
+  float persistence = uniforms.persistence;
   float x = uniforms.pos.x + (float(gid.x)/float(threads.x)) + (grey(xoffset.read(gid)) * disStren);
   float y = uniforms.pos.y + (float(gid.y)/float(threads.y)) + (grey(yoffset.read(gid)) * disStren);
   float z = uniforms.z;
@@ -685,7 +685,7 @@ kernel void billowGenerator(texture2d<float, access::write> outTexture [[texture
     
     freq *= lacunarity;
     maxAmplitude += amplitude;
-    amplitude *= persistance;
+    amplitude *= persistence;
   }
   
   float r = total / maxAmplitude;
@@ -713,7 +713,7 @@ kernel void ridgedMultiGenerator(texture2d<float, access::write> outTexture [[te
   int octaves = uniforms.octaves;
   float freq = uniforms.frequency;
   float lacunarity = uniforms.lacunarity;
-  float persistance = uniforms.persistance;
+  float persistence = uniforms.persistence;
   float x = uniforms.pos.x + (float(gid.x)/float(threads.x)) + (grey(xoffset.read(gid)) * disStren);
   float y = uniforms.pos.y + (float(gid.y)/float(threads.y)) + (grey(yoffset.read(gid)) * disStren);
   float z = uniforms.z;
@@ -756,7 +756,7 @@ kernel void ridgedMultiGenerator(texture2d<float, access::write> outTexture [[te
     
     freq *= lacunarity;
     maxAmplitude += amplitude;
-    amplitude *= persistance;
+    amplitude *= persistence;
   }
   
   float r = total / maxAmplitude;

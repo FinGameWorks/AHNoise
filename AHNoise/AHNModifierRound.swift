@@ -31,7 +31,7 @@ public class AHNModifierRound: AHNModifier {
    
    Default value is `1.0`, causing no effect.
    */
-  public var round: Float = 1{
+  public var roundValue: Float = 1{
     didSet{
       dirty = true
     }
@@ -74,7 +74,7 @@ public class AHNModifierRound: AHNModifier {
   
   ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
   public override func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = round
+    var uniforms = roundValue
     
     if uniformBuffer == nil{
       uniformBuffer = context.device.newBufferWithLength(strideof(Float), options: .CPUCacheModeDefaultCache)

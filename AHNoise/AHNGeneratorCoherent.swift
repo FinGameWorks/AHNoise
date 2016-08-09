@@ -18,7 +18,7 @@ struct CoherentInputs {
   var pos: vector_float2
   var rotations: vector_float3
   var octaves: Int32
-  var persistance: Float
+  var persistence: Float
   var frequency: Float
   var lacunarity: Float
   var zValue: Float
@@ -43,7 +43,7 @@ public class AHNGeneratorCoherent: AHNGenerator {
   // MARK:- Properties
   
   
-  ///When `true`, the simplex kernel used has four degrees of freedom, which allows for interesting seamless patterns but has extra computational cost. This has no effect for the `AHNGeneratorVoronoi` which is always calculated in 4 dimensions. The default value is `false`.
+  ///When `true`, the simplex kernel used has four degrees of freedom, which allows for interesting seamless patterns but has extra computational cost. This has no effect for the `AHNGeneratorVoronoi`, which is always calculated in 4 dimensions. The default value is `false`.
   public var use4D: Bool = false{
     didSet{
       dirty = true
@@ -60,7 +60,7 @@ public class AHNGeneratorCoherent: AHNGenerator {
   
   
   
-  ///When `true`, the output texture can be seamlessly tiled without apprent edges showing. When `true` the `zValue` and `wValue` properties have no effect as they are overridden in the shader to produce the seamless effect. The default value is `false`.
+  ///When `true`, the output texture can be seamlessly tiled without apparent edges showing. When `true` the `zValue` and `wValue` properties have no effect as they are overridden in the shader to produce the seamless effect. The default value is `false`.
   public var seamless: Bool = false{
     didSet{
       dirty = true
@@ -70,7 +70,7 @@ public class AHNGeneratorCoherent: AHNGenerator {
   
   
   /**
-   The number of `octaves` to use in the texture. Each `octave` is calculated with a different amplitude (altered by the `persistance` property) and `frequency` (altered by the `lacunarity` property). The amplitude starts with a value of `1.0`, the first octave is calculated using this value, the amplitude is then multiplied by the `persistance` and the next octave is calculated using this new amplitude before multiplying it again by the `persistance` and so on. The `frequency` follows a similar pattern with the `lacunarity` property.
+   The number of `octaves` to use in the texture. Each `octave` is calculated with a different amplitude (altered by the `persistence` property) and `frequency` (altered by the `lacunarity` property). The amplitude starts with a value of `1.0`, the first octave is calculated using this value, the amplitude is then multiplied by the `persistence` and the next octave is calculated using this new amplitude before multiplying it again by the `persistence` and so on. The `frequency` follows a similar pattern with the `lacunarity` property.
    
    Each `octave` is calculated and then combined to produce the final value.
    
@@ -87,13 +87,13 @@ public class AHNGeneratorCoherent: AHNGenerator {
   
   
   /**
-   Varies the amplitude every octave. The amplitude is multipled by the `persisance` for each octave. Generally values less than 1.0 are used.
+   Varies the amplitude every octave. The amplitude is multiplied by the `persistence` for each octave. Generally values less than 1.0 are used.
    
-   For example an initial amplitude of `1.0` (fixed) and a `persistance` of `0.5` for `4` octaves would produce an amplitude of `1.0`, `0.5`, `0.25` and `0.125` respectively for each octave.
+   For example an initial amplitude of `1.0` (fixed) and a `persistence` of `0.5` for `4` octaves would produce an amplitude of `1.0`, `0.5`, `0.25` and `0.125` respectively for each octave.
    
    The default value is `0.5`.
    */
-  public var persistance: Float = 0.5{
+  public var persistence: Float = 0.5{
     didSet{
       dirty = true
     }
@@ -117,9 +117,9 @@ public class AHNGeneratorCoherent: AHNGenerator {
   
   
   /**
-   Varies the `frequency` every octave. The `frequency` is multipled by the `lacunarity` for each octave. Generally values less than `1.0` are used.
+   Varies the `frequency` every octave. The `frequency` is multiplied by the `lacunarity` for each octave. Generally values greater than `1.0` are used.
    
-   For example an initial `frequency` of `1.0` and a `lacunarity` of `0.5` for `4` octaves would produce a `frequency` of `1.0`, `0.5`, `0.25` and `0.125` respectively for each octave.
+   For example an initial `frequency` of `1.0` and a `lacunarity` of `2.0` for `4` octaves would produce a `frequency` of `1.0`, `2.0`, `4.0` and `8.0` respectively for each octave.
    
    The default value is `2.0`.
    */

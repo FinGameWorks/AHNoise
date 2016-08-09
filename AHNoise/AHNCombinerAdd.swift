@@ -26,7 +26,7 @@ public class AHNCombinerAdd: AHNCombiner {
   // MARK:- Properties
   
   
-  ///When set to `true` (false by default) the output value range is remapped back to `0.0 - 1.0` to prevent overly bright areas where the combination of inputs has exceeded `1.0`. Setting this to `true` results in the output being the average of the two inputs.
+  ///When set to `true` (`false` by default) the output value range is remapped back to `0.0 - 1.0` to prevent overly bright areas where the combination of inputs has exceeded `1.0`. Setting this to `true` results in the output being the average of the two inputs.
   public var normalise: Bool = false{
     didSet{
       dirty = true

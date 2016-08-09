@@ -21,7 +21,7 @@ public class AHNGeneratorGradientBox: AHNGenerator {
   // MARK:- Properties
   
   
-  ///The falloff of the gradients originating from the left and right hand texture edges. The default value of `0.0` results in the hoizontal gradients terminating at the centre of the texture, higher values cause the gradient to terminate closer to its originating edge.
+  ///The falloff of the gradients originating from the left and right hand texture edges. The default value of `0.0` results in the horizontal gradients terminating at the centre of the texture, higher values cause the gradient to terminate closer to its originating edge.
   public var xFallOff: Float = 0{
     didSet{
       dirty = true
