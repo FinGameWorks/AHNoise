@@ -12,13 +12,8 @@ using namespace metal;
 
 // MARK:- Raw simplex functions
 
-static constant float3 grad3 [12] = {float3(1,1,0),float3(-1,1,0),float3(1,-1,0),float3(-1,-1, 0),float3(1,0,1),float3(-1,0,1),float3(1,0,-1),float3(-1,0,-1),float3(0,1,1),float3(0,-1,1),float3(0,1,-1),float3(0,-1,-1)};
 
-static constant float4 grad4 [32] = {float4(0,1,1,1),float4(0,1,1,-1),float4(0,1,-1,1),float4(0,1,-1,-1),float4(0,-1,1,1),float4(0,-1,1,-1),float4(0,-1,-1,1),float4(0,-1,-1,-1),float4(1,0,1,1),float4(1,0,1,-1),float4(1,0,-1,1),float4(1,0,-1,-1),float4(-1,0,1,1),float4(-1,0,1,-1),float4(-1,0,-1,1),float4(-1,0,-1,-1),float4(1,1,0,1),float4(1,1,0,-1),float4(1,-1,0,1),float4(1,-1,0,-1),float4(-1,1,0,1),float4(-1,1,0,-1),float4(-1,-1,0,1),float4(-1,-1,0,-1),float4(1,1,1,0),float4(1,1,-1,0),float4(1,-1,1,0),float4(1,-1,-1,0),float4(-1,1,1,0),float4(-1,1,-1,0),float4(-1,-1,1,0),float4(-1,-1,-1,0)};
 
-static constant int perm [512] = {151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,190,6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,88,237,149,56,87,174,20,125,136,171,168,68,175,74,165,71,134,139,48,27,166,77,146,158,231,83,111,229,122,60,211,133,230,220,105,92,41,55,46,245,40,244,102,143,54,65,25,63,161,1,216,80,73,209,76,132,187,208,89,18,169,200,196,135,130,116,188,159,86,164,100,109,198,173,186,3,64,52,217,226,250,124,123,5,202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,58,17,182,189,28,42,223,183,170,213,119,248,152,2,44,154,163,70,221,153,101,155,167,43,172,9,129,22,39,253,19,98,108,110,79,113,224,232,178,185,112,104,218,246,97,228,251,34,242,193,238,210,144,12,191,179,162,241,81,51,145,235,249,14,239,107,49,192,214,31,181,199,106,157,184,84,204,176,115,121,50,45,127,4,150,254,138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180,151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,190,6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,88,237,149,56,87,174,20,125,136,171,168,68,175,74,165,71,134,139,48,27,166,77,146,158,231,83,111,229,122,60,211,133,230,220,105,92,41,55,46,245,40,244,102,143,54,65,25,63,161,1,216,80,73,209,76,132,187,208,89,18,169,200,196,135,130,116,188,159,86,164,100,109,198,173,186,3,64,52,217,226,250,124,123,5,202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,58,17,182,189,28,42,223,183,170,213,119,248,152,2,44,154,163,70,221,153,101,155,167,43,172,9,129,22,39,253,19,98,108,110,79,113,224,232,178,185,112,104,218,246,97,228,251,34,242,193,238,210,144,12,191,179,162,241,81,51,145,235,249,14,239,107,49,192,214,31,181,199,106,157,184,84,204,176,115,121,50,45,127,4,150,254,138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180};
-
-static constant int permMod12 [512] = {7,4,5,7,6,3,11,1,9,11,0,5,2,5,7,9,8,0,7,6,9,10,8,3,1,0,9,10,11,10,6,4,7,0,6,3,0,2,5,2,10,0,3,11,9,11,11,8,9,9,9,4,9,5,8,3,6,8,5,4,3,0,8,7,2,9,11,2,7,0,3,10,5,2,2,3,11,3,1,2,0,7,1,2,4,9,8,5,7,10,5,4,4,6,11,6,5,1,3,5,1,0,8,1,5,4,0,7,4,5,6,1,8,4,3,10,8,8,3,2,8,4,1,6,5,6,3,4,4,1,10,10,4,3,5,10,2,3,10,6,3,10,1,8,3,2,11,11,11,4,10,5,2,9,4,6,7,3,2,9,11,8,8,2,8,10,7,10,5,9,5,11,11,7,4,9,9,10,3,1,7,2,0,2,7,5,8,4,10,5,4,8,2,6,1,0,11,10,2,1,10,6,0,0,11,11,6,1,9,3,1,7,9,2,11,11,1,0,10,7,1,7,10,1,4,0,0,8,7,1,2,9,7,4,6,2,6,8,1,9,6,6,7,5,0,0,3,9,8,3,6,6,11,1,0,0,7,4,5,7,6,3,11,1,9,11,0,5,2,5,7,9,8,0,7,6,9,10,8,3,1,0,9,10,11,10,6,4,7,0,6,3,0,2,5,2,10,0,3,11,9,11,11,8,9,9,9,4,9,5,8,3,6,8,5,4,3,0,8,7,2,9,11,2,7,0,3,10,5,2,2,3,11,3,1,2,0,7,1,2,4,9,8,5,7,10,5,4,4,6,11,6,5,1,3,5,1,0,8,1,5,4,0,7,4,5,6,1,8,4,3,10,8,8,3,2,8,4,1,6,5,6,3,4,4,1,10,10,4,3,5,10,2,3,10,6,3,10,1,8,3,2,11,11,11,4,10,5,2,9,4,6,7,3,2,9,11,8,8,2,8,10,7,10,5,9,5,11,11,7,4,9,9,10,3,1,7,2,0,2,7,5,8,4,10,5,4,8,2,6,1,0,11,10,2,1,10,6,0,0,11,11,6,1,9,3,1,7,9,2,11,11,1,0,10,7,1,7,10,1,4,0,0,8,7,1,2,9,7,4,6,2,6,8,1,9,6,6,7,5,0,0,3,9,8,3,6,6,11,1,0,0};
 
 // Skewing and unskewing factors for 3/4D
 static constant float F3 = 1.0/3.0;
@@ -27,8 +22,8 @@ static constant float F4 = 0.3090169944;
 static constant float G4 = 0.1381966011;
 
 // 3D Simplex Noise
-float simplex3D(float xin, float yin, float zin);
-float simplex3D(float xin, float yin, float zin)
+float simplex3D(float xin, float yin, float zin, constant float3 *grad3, constant int *perm, constant int *permMod12);
+float simplex3D(float xin, float yin, float zin, constant float3 *grad3, constant int *perm, constant int *permMod12)
 {
   float3 pos = float3(xin,yin,zin);
   float s = (pos.x+pos.y+pos.z)*F3;
@@ -100,7 +95,7 @@ float simplex3D(float xin, float yin, float zin)
   int jj = j & 255;
   int kk = k & 255;
   int gi0 = permMod12[ii+perm[jj+perm[kk]]];
-  int gi1 = permMod12[ii+1+perm[jj+j1+perm[kk+k1]]];
+  int gi1 = permMod12[ii+i1+perm[jj+j1+perm[kk+k1]]];
   int gi2 = permMod12[ii+i2+perm[jj+j2+perm[kk+k2]]];
   int gi3 = permMod12[ii+1+perm[jj+1+perm[kk+1]]];
   
@@ -140,8 +135,8 @@ float simplex3D(float xin, float yin, float zin)
 }
 
 // 4D Simplex Noise
-float simplex4D(float xin, float yin, float zin, float win);
-float simplex4D(float xin, float yin, float zin, float win)
+float simplex4D(float xin, float yin, float zin, float win, constant float4 *grad4, constant int *perm, constant int *permMod12);
+float simplex4D(float xin, float yin, float zin, float win, constant float4 *grad4, constant int *perm, constant int *permMod12)
 {
   float4 pos = float4(xin,yin,zin,win);
   
@@ -245,15 +240,15 @@ float simplex4D(float xin, float yin, float zin, float win)
   float w4 = w0 - 1.0 + 4.0*G4;
   
   // Work out the hashed gradient indices of the five simplex corners
-  int ii = 1;//i & 255;
-  int jj = 1;//j & 255;
-  int kk = 1;//k & 255;
-  int ll = 1;//l & 255;
-  int gi0 = 1;//perm[ii+perm[jj+perm[kk+perm[ll]]]] % 32;
-  int gi1 = 1;//perm[ii+i1+perm[jj+j1+perm[kk+k1+perm[ll+l1]]]] % 32;
-  int gi2 = 1;//perm[ii+i2+perm[jj+j2+perm[kk+k2+perm[ll+l2]]]] % 32;
-  int gi3 = 1;//perm[ii+i3+perm[jj+j3+perm[kk+k3+perm[ll+l3]]]] % 32;
-  int gi4 = 1;//perm[ii+1+perm[jj+1+perm[kk+1+perm[ll+1]]]] % 32;
+  int ii = i & 255;
+  int jj = j & 255;
+  int kk = k & 255;
+  int ll = l & 255;
+  int gi0 = perm[ii+perm[jj+perm[kk+perm[ll]]]] % 32;
+  int gi1 = perm[ii+i1+perm[jj+j1+perm[kk+k1+perm[ll+l1]]]] % 32;
+  int gi2 = perm[ii+i2+perm[jj+j2+perm[kk+k2+perm[ll+l2]]]] % 32;
+  int gi3 = perm[ii+i3+perm[jj+j3+perm[kk+k3+perm[ll+l3]]]] % 32;
+  int gi4 = perm[ii+1+perm[jj+1+perm[kk+1+perm[ll+1]]]] % 32;
   
   // Calculate the contribution from the five corners
   float t0 = 0.6 - x0*x0 - y0*y0 - z0*z0 - w0*w0;
@@ -361,13 +356,13 @@ struct VoronoiInputs {
 };
 
 
-float4 getCellPoint(int4 cell, float frequency);
-float4 getCellPoint(int4 cell, float frequency){
+float4 getCellPoint(int4 cell, float frequency, constant float4 *grad4, constant int *perm, constant int *permMod12);
+float4 getCellPoint(int4 cell, float frequency, constant float4 *grad4, constant int *perm, constant int *permMod12){
   float4 cellBase = float4(cell) / frequency;
-  float noiseX = (simplex4D(cell.x, cell.y, cell.z, cell.w)+1)/3;
-  float noiseY = (simplex4D(cell.z, cell.w, cell.y, cell.x)+1)/3;
-  float noiseZ = (simplex4D(cell.y, cell.x, cell.w, cell.z)+1)/3;
-  float noiseW = (simplex4D(cell.w, cell.z, cell.x, cell.y)+1)/3;
+  float noiseX = (simplex4D(cell.x, cell.y, cell.z, cell.w, grad4, perm, permMod12)+1)/3;
+  float noiseY = (simplex4D(cell.z, cell.w, cell.y, cell.x, grad4, perm, permMod12)+1)/3;
+  float noiseZ = (simplex4D(cell.y, cell.x, cell.w, cell.z, grad4, perm, permMod12)+1)/3;
+  float noiseW = (simplex4D(cell.w, cell.z, cell.x, cell.y, grad4, perm, permMod12)+1)/3;
   return cellBase + (0.5 + (1.5 * float4(noiseX, noiseY, noiseZ, noiseW))) / frequency;
 }
 
@@ -411,8 +406,8 @@ float minkowski(float4 p1, float4 p2, float c){
 
 
 
-float worley(float4 coo, float frequency);
-float worley(float4 coo, float frequency){
+float worley(float4 coo, float frequency, constant float4 *grad4, constant int *perm, constant int *permMod12);
+float worley(float4 coo, float frequency, constant float4 *grad4, constant int *perm, constant int *permMod12){
   int4 cell = int4(coo * frequency);
   float dist = 1.0;
   float dist2 = 1.0;
@@ -422,7 +417,7 @@ float worley(float4 coo, float frequency){
     for (int y = -2; y < 2; y++) {
       for (int z = -2; z < 2; z++) {
         for (int w = -2; w < 2; w++) {
-          float4 cellPoint = getCellPoint(cell + int4(x, y, z, w), frequency);
+          float4 cellPoint = getCellPoint(cell + int4(x, y, z, w), frequency, grad4, perm, permMod12);
           float d = pythagorean(cellPoint, coo);
           if (d < dist){
             dist2 = dist;
@@ -444,7 +439,11 @@ float worley(float4 coo, float frequency){
 kernel void voronoiGenerator(texture2d<float, access::write> outTexture [[texture(0)]],
                              texture2d<float, access::read> xoffset [[texture(1)]],
                              texture2d<float, access::read> yoffset [[texture(2)]],
-                             constant VoronoiInputs &uniforms [[buffer(0)]],
+                             constant float3 *grad3 [[buffer(0)]],
+                             constant float4 *grad4 [[buffer(1)]],
+                             constant int *perm [[buffer(2)]],
+                             constant int *permMod12 [[buffer(3)]],
+                             constant VoronoiInputs &uniforms [[buffer(4)]],
                              uint2 gid [[thread_position_in_grid]],
                              uint2 threads [[threads_per_grid]])
 {
@@ -497,7 +496,7 @@ kernel void voronoiGenerator(texture2d<float, access::write> outTexture [[textur
     w = nw;
   }
   for (int j = 0; j < octaves; ++j){
-    total += worley(float4(x, y, z, w), freq) * amplitude;
+    total += worley(float4(x, y, z, w), freq, grad4, perm, permMod12) * amplitude;
     
     freq *= lacunarity;
     maxAmplitude += amplitude;
@@ -555,7 +554,11 @@ struct CoherentInputs{
 kernel void simplexGenerator(texture2d<float, access::write> outTexture [[texture(0)]],
                              texture2d<float, access::read> xoffset [[texture(1)]],
                              texture2d<float, access::read> yoffset [[texture(2)]],
-                             constant CoherentInputs &uniforms [[buffer(0)]],
+                             constant float3 *grad3 [[buffer(0)]],
+                             constant float4 *grad4 [[buffer(1)]],
+                             constant int *perm [[buffer(2)]],
+                             constant int *permMod12 [[buffer(3)]],
+                             constant CoherentInputs &uniforms [[buffer(4)]],
                              uint2 gid [[thread_position_in_grid]],
                              uint2 threads [[threads_per_grid]])
 {
@@ -606,9 +609,9 @@ kernel void simplexGenerator(texture2d<float, access::write> outTexture [[textur
   
   for (int j = 0; j < octaves; ++j){
     if (use4D == 0){
-      total += ((simplex3D(x*freq,y*freq,z*freq)+1)/2) * amplitude;
+      total += ((simplex3D(x*freq,y*freq,z*freq,grad3,perm,permMod12)+1)/2) * amplitude;
     }else{
-      total += ((simplex4D(x*freq,y*freq,z*freq,w*freq)+1)/2) * amplitude;
+      total += ((simplex4D(x*freq,y*freq,z*freq,w*freq,grad4,perm,permMod12)+1)/2) * amplitude;
     }
     
     freq *= lacunarity;
@@ -626,7 +629,11 @@ kernel void simplexGenerator(texture2d<float, access::write> outTexture [[textur
 kernel void billowGenerator(texture2d<float, access::write> outTexture [[texture(0)]],
                             texture2d<float, access::read> xoffset [[texture(1)]],
                             texture2d<float, access::read> yoffset [[texture(2)]],
-                            constant CoherentInputs &uniforms [[buffer(0)]],
+                            constant float3 *grad3 [[buffer(0)]],
+                            constant float4 *grad4 [[buffer(1)]],
+                            constant int *perm [[buffer(2)]],
+                            constant int *permMod12 [[buffer(3)]],
+                            constant CoherentInputs &uniforms [[buffer(4)]],
                             uint2 gid [[thread_position_in_grid]],
                             uint2 threads [[threads_per_grid]])
 {
@@ -678,9 +685,9 @@ kernel void billowGenerator(texture2d<float, access::write> outTexture [[texture
   for (int j = 0; j < octaves; ++j){
     
     if (use4D == 0){
-      total += abs(simplex3D(x*freq,y*freq,z*freq)) * amplitude;
+      total += abs(simplex3D(x*freq,y*freq,z*freq,grad3,perm,permMod12)) * amplitude;
     }else{
-      total += abs(simplex4D(x*freq,y*freq,z*freq,w*freq)) * amplitude;
+      total += abs(simplex4D(x*freq,y*freq,z*freq,w*freq,grad4,perm,permMod12)) * amplitude;
     }
     
     freq *= lacunarity;
@@ -698,7 +705,11 @@ kernel void billowGenerator(texture2d<float, access::write> outTexture [[texture
 kernel void ridgedMultiGenerator(texture2d<float, access::write> outTexture [[texture(0)]],
                                  texture2d<float, access::read> xoffset [[texture(1)]],
                                  texture2d<float, access::read> yoffset [[texture(2)]],
-                                 constant CoherentInputs &uniforms [[buffer(0)]],
+                                 constant float3 *grad3 [[buffer(0)]],
+                                 constant float4 *grad4 [[buffer(1)]],
+                                 constant int *perm [[buffer(2)]],
+                                 constant int *permMod12 [[buffer(3)]],
+                                 constant CoherentInputs &uniforms [[buffer(4)]],
                                  uint2 gid [[thread_position_in_grid]],
                                  uint2 threads [[threads_per_grid]])
 {
@@ -749,9 +760,9 @@ kernel void ridgedMultiGenerator(texture2d<float, access::write> outTexture [[te
   
   for (int j = 0; j < octaves; ++j){
     if (use4D == 0){
-      total += ((-abs(simplex3D(x*freq,y*freq,z*freq))*2)+1) * amplitude;
+      total += ((-abs(simplex3D(x*freq,y*freq,z*freq,grad3,perm,permMod12))*2)+1) * amplitude;
     }else{
-      total += ((-abs(simplex4D(x*freq,y*freq,z*freq,w*freq))*2)+1) * amplitude;
+      total += ((-abs(simplex4D(x*freq,y*freq,z*freq,w*freq,grad4,perm,permMod12))*2)+1) * amplitude;
     }
     
     freq *= lacunarity;

@@ -201,4 +201,19 @@ open class AHNGeneratorCoherent: AHNGenerator {
   public required init() {
     super.init()
   }
+  
+  
+  
+  
+  
+  
+  
+  
+  // MARK:- Array buffer binding
+  open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
+    commandEncoder.setBuffer(context.grad3Buffer, offset: 0, at: 0)
+    commandEncoder.setBuffer(context.grad4Buffer, offset: 0, at: 1)
+    commandEncoder.setBuffer(context.permBuffer, offset: 0, at: 2)
+    commandEncoder.setBuffer(context.permMod12Buffer, offset: 0, at: 3)
+  }
 }

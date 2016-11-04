@@ -243,7 +243,7 @@ open class AHNGenerator: NSObject, AHNTextureProvider {
     commandEncoder.setTexture(internalTexture, at: 0)
     commandEncoder.setTexture(xoffsetInput?.texture() ?? defaultDisplaceTexture!, at: 1)
     commandEncoder.setTexture(yoffsetInput?.texture() ?? defaultDisplaceTexture!, at: 2)
-
+    
     configureArgumentTableWithCommandencoder(commandEncoder)
     commandEncoder.dispatchThreadgroups(threadGroups, threadsPerThreadgroup: threadGroupsCount)
     commandEncoder.endEncoding()
