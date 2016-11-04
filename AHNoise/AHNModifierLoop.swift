@@ -25,14 +25,14 @@ struct LoopModifierUniforms {
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNModifierLoop: AHNModifier {
+open class AHNModifierLoop: AHNModifier {
   
   
   // MARK:- Properties
   
   
   ///The value to loop at. No texture value will exceed this value (unless `normalise` is set to `true`). The default value is `0.5`.
-  public var boundary: Float = 0.5{
+  open var boundary: Float = 0.5{
     didSet{
       dirty = true
     }
@@ -41,7 +41,7 @@ public class AHNModifierLoop: AHNModifier {
   
   
   ///If `false`, the output is within the range `0.0 - loopValue`, if `true` the output is remapped to cover the whole `0.0 - 1.0` range. The default value is `false`.
-  public var normalise: Bool = false{
+  open var normalise: Bool = false{
     didSet{
       dirty = true
     }
@@ -77,15 +77,15 @@ public class AHNModifierLoop: AHNModifier {
   
   
   ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
-  public override func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
+  open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     var uniforms = LoopModifierUniforms(normalise: normalise, loopValue: boundary)
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(strideof(LoopModifierUniforms), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<LoopModifierUniforms>.stride, options: MTLResourceOptions())
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, strideof(LoopModifierUniforms))
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<LoopModifierUniforms>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
   }
 }

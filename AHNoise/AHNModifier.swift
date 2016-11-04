@@ -16,14 +16,14 @@ import simd
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNModifier: NSObject, AHNTextureProvider {
+open class AHNModifier: NSObject, AHNTextureProvider {
   
   
   // MARK:- Properties
   
   
   ///The `AHNContext` that is being used by the `AHNTextureProvider` to communicate with the GPU. This is recovered from the first `AHNGenerator` class that is encountered in the chain of classes.
-  public var context: AHNContext
+  open var context: AHNContext
   
   
   
@@ -33,7 +33,7 @@ public class AHNModifier: NSObject, AHNTextureProvider {
   
   
   ///The `MTLBuffer` used to transfer the constant values used by the compute kernel to the GPU.
-  public var uniformBuffer: MTLBuffer?
+  open var uniformBuffer: MTLBuffer?
   
   
   
@@ -52,17 +52,17 @@ public class AHNModifier: NSObject, AHNTextureProvider {
   
   
   ///Indicates whether or not the `internalTexture` needs updating.
-  public var dirty: Bool = true
+  open var dirty: Bool = true
   
   
   
   ///The input that will be modified to provide the output.
-  public var provider: AHNTextureProvider?
+  open var provider: AHNTextureProvider?
 
   
   
   ///Indicates whether this modifier makes use of a `Metal Performance Shader`
-  public var usesMPS = false
+  open var usesMPS = false
   
   
   
@@ -71,7 +71,7 @@ public class AHNModifier: NSObject, AHNTextureProvider {
    
    This is dictated by the width of the texture of the input `AHNTextureProvider`. If there is no input, the default width is `128` pixels.
    */
-  public var width: Int{
+  open var width: Int{
     get{
       return provider?.textureSize().width ?? 128
     }
@@ -84,7 +84,7 @@ public class AHNModifier: NSObject, AHNTextureProvider {
    
    This is dictated by the height of the texture of the input `AHNTextureProvider`. If there is no input, the default height is `128` pixels.
    */
-  public var height: Int{
+  open var height: Int{
     get{
       return provider?.textureSize().height ?? 128
     }
@@ -113,13 +113,13 @@ public class AHNModifier: NSObject, AHNTextureProvider {
   init(functionName: String) {
     context = AHNContext.SharedContext
     
-    guard let kernelFunction = context.library.newFunctionWithName(functionName) else{
+    guard let kernelFunction = context.library.makeFunction(name: functionName) else{
       fatalError("AHNoise: Error loading function \(functionName).")
     }
     self.kernelFunction = kernelFunction
     
     do{
-      try pipeline = context.device.newComputePipelineStateWithFunction(kernelFunction)
+      try pipeline = context.device.makeComputePipelineState(function: kernelFunction)
     }catch let error{
       fatalError("AHNoise: Error creating pipeline state for \(functionName).\n\(error)")
     }
@@ -131,13 +131,13 @@ public class AHNModifier: NSObject, AHNTextureProvider {
     context = AHNContext.SharedContext
     
     // Load the kernel function and compute pipeline state
-    guard let kernelFunction = context.library.newFunctionWithName("simplexGenerator") else{
+    guard let kernelFunction = context.library.makeFunction(name: "simplexGenerator") else{
       fatalError("AHNoise: Error loading function simplexGenerator.")
     }
     self.kernelFunction = kernelFunction
     
     do{
-      try pipeline = context.device.newComputePipelineStateWithFunction(kernelFunction)
+      try pipeline = context.device.makeComputePipelineState(function: kernelFunction)
     }catch let error{
       fatalError("AHNoise: Error creating pipeline state for simplexGenerator.\n\(error)")
     }
@@ -164,7 +164,7 @@ public class AHNModifier: NSObject, AHNTextureProvider {
    
    - parameter commandEncoder: The `MTLComputeCommandEncoder` used to run the kernel. This can be used to lazily create a buffer of data and add it to the argument table. Any buffer index can be used without affecting the rest of this class.
    */
-  public func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder){
+  open func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder){
   }
   
   
@@ -174,7 +174,7 @@ public class AHNModifier: NSObject, AHNTextureProvider {
    
    - parameter commandBuffer: The `MTLCommandBuffer` used to run the `Metal Performance Shader`.
    */
-  public func addMetalPerformanceShaderToBuffer(commandBuffer: MTLCommandBuffer){
+  open func addMetalPerformanceShaderToBuffer(_ commandBuffer: MTLCommandBuffer){
   }
   
   
@@ -199,7 +199,7 @@ public class AHNModifier: NSObject, AHNTextureProvider {
    
    This should not need to be called manually as it is called by the `texture()` method automatically if the texture does not represent the current properties.
    */
-  public func updateTexture(){
+  open func updateTexture(){
 
     if provider?.texture() == nil {return}
     
@@ -213,16 +213,16 @@ public class AHNModifier: NSObject, AHNTextureProvider {
     let threadGroupsCount = MTLSizeMake(8, 8, 1)
     let threadGroups = MTLSizeMake(width / threadGroupsCount.width, height / threadGroupsCount.height, 1)
     
-    let commandBuffer = context.commandQueue.commandBuffer()
+    let commandBuffer = context.commandQueue.makeCommandBuffer()
     
     // If an MPS is being used, encode it to the command buffer, else create a command encoder for a custom kernel
     if usesMPS{
       addMetalPerformanceShaderToBuffer(commandBuffer)
     }else{
-      let commandEncoder = commandBuffer.computeCommandEncoder()
+      let commandEncoder = commandBuffer.makeComputeCommandEncoder()
       commandEncoder.setComputePipelineState(pipeline)
-      commandEncoder.setTexture(provider!.texture(), atIndex: 0)
-      commandEncoder.setTexture(internalTexture, atIndex: 1)
+      commandEncoder.setTexture(provider!.texture(), at: 0)
+      commandEncoder.setTexture(internalTexture, at: 1)
       configureArgumentTableWithCommandencoder(commandEncoder)
       commandEncoder.dispatchThreadgroups(threadGroups, threadsPerThreadgroup: threadGroupsCount)
       commandEncoder.endEncoding()
@@ -237,14 +237,14 @@ public class AHNModifier: NSObject, AHNTextureProvider {
   
   ///Create a new `internalTexture` for the first time or whenever the texture is resized.
   func newInternalTexture(){
-    let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(.RGBA8Unorm, width: width, height: height, mipmapped: false)
-    internalTexture = context.device.newTextureWithDescriptor(textureDescriptor)
+    let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm, width: width, height: height, mipmapped: false)
+    internalTexture = context.device.makeTexture(descriptor: textureDescriptor)
   }
   
   
   
   ///- returns: The updated output `MTLTexture` for this module.
-  public func texture() -> MTLTexture?{
+  open func texture() -> MTLTexture?{
     if isDirty(){
       updateTexture()
     }
@@ -254,21 +254,21 @@ public class AHNModifier: NSObject, AHNTextureProvider {
   
   
   ///- returns: The MTLSize of the the output `MTLTexture`. If no size has been explicitly set, the default value returned is `128`x`128` pixels.
-  public func textureSize() -> MTLSize{
+  open func textureSize() -> MTLSize{
     return MTLSizeMake(width, height, 1)
   }
   
   
   
   ///- returns: The input `AHNTextureProvider` that provides the input `MTLTexture` to the `AHNModifier`. This is taken from the `input`. If there is no `input`, returns `nil`.
-  public func textureProvider() -> AHNTextureProvider?{
+  open func textureProvider() -> AHNTextureProvider?{
     return provider
   }
   
   
   
   ///- returns: `False` if the input and the `internalTexture` do not need updating.
-  public func isDirty() -> Bool {
+  open func isDirty() -> Bool {
     if let p = provider{
       return p.isDirty() || dirty
     }else{
@@ -279,7 +279,7 @@ public class AHNModifier: NSObject, AHNTextureProvider {
   
   
   ///- returns: `False` if the required texture input is `nil`.
-  public func canUpdate() -> Bool {
+  open func canUpdate() -> Bool {
     return provider != nil
   }
 }

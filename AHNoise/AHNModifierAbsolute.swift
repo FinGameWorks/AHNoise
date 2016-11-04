@@ -19,14 +19,14 @@ import simd
  
  *Conforms to the `AHNTextureProvider` protocol.*
 */
-public class AHNModifierAbsolute: AHNModifier {
+open class AHNModifierAbsolute: AHNModifier {
   
 
   // MARK:- Properties
   
   
   ///If `false` (the default), the output is within the range `0.5 - 1.0`, if `true` the output is remapped to cover the whole `0.0 - 1.0` range of the input.
-  public var normalise: Bool = false{
+  open var normalise: Bool = false{
     didSet{
       dirty = true
     }
@@ -59,15 +59,15 @@ public class AHNModifierAbsolute: AHNModifier {
   
   
   ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
-  public override func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
+  open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     var uniforms = normalise
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(strideof(Bool), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<Bool>.stride, options: MTLResourceOptions())
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, strideof(Bool))
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<Bool>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
   }
 }

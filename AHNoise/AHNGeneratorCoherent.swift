@@ -37,14 +37,14 @@ struct CoherentInputs {
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNGeneratorCoherent: AHNGenerator {
+open class AHNGeneratorCoherent: AHNGenerator {
   
   
   // MARK:- Properties
   
   
   ///When `true`, the simplex kernel used has four degrees of freedom, which allows for interesting seamless patterns but has extra computational cost. This has no effect for the `AHNGeneratorVoronoi`, which is always calculated in 4 dimensions. The default value is `false`.
-  public var use4D: Bool = false{
+  open var use4D: Bool = false{
     didSet{
       dirty = true
     }
@@ -52,7 +52,7 @@ public class AHNGeneratorCoherent: AHNGenerator {
   
   
   ///When `true`, the output texture is warped towards the top and bottom to seamless map to a UV sphere. When `true` the `zValue` and `wValue` properties have no effect as they are overridden in the shader to produce the sphere mapped effect. The default value is `false`.
-  public var sphereMap: Bool = false{
+  open var sphereMap: Bool = false{
     didSet{
       dirty = true
     }
@@ -61,7 +61,7 @@ public class AHNGeneratorCoherent: AHNGenerator {
   
   
   ///When `true`, the output texture can be seamlessly tiled without apparent edges showing. When `true` the `zValue` and `wValue` properties have no effect as they are overridden in the shader to produce the seamless effect. The default value is `false`.
-  public var seamless: Bool = false{
+  open var seamless: Bool = false{
     didSet{
       dirty = true
     }
@@ -78,7 +78,7 @@ public class AHNGeneratorCoherent: AHNGenerator {
    
    The default value is `6`.
    */
-  public var octaves: Int = 6{
+  open var octaves: Int = 6{
     didSet{
       dirty = true
     }
@@ -93,7 +93,7 @@ public class AHNGeneratorCoherent: AHNGenerator {
    
    The default value is `0.5`.
    */
-  public var persistence: Float = 0.5{
+  open var persistence: Float = 0.5{
     didSet{
       dirty = true
     }
@@ -108,7 +108,7 @@ public class AHNGeneratorCoherent: AHNGenerator {
    
    The default value is `1.0`.
    */
-  public var frequency: Float = 1.0{
+  open var frequency: Float = 1.0{
     didSet{
       dirty = true
     }
@@ -123,7 +123,7 @@ public class AHNGeneratorCoherent: AHNGenerator {
    
    The default value is `2.0`.
    */
-  public var lacunarity: Float = 2.0{
+  open var lacunarity: Float = 2.0{
     didSet{
       dirty = true
     }
@@ -134,7 +134,7 @@ public class AHNGeneratorCoherent: AHNGenerator {
   ///The origin of the noise along the x axis in noise space. Changing this slightly will make the noise texture appear to move.
   ///
   ///The default value is `1.0`.
-  public var xValue: Float = 1{
+  open var xValue: Float = 1{
     didSet{
       dirty = true
     }
@@ -145,7 +145,7 @@ public class AHNGeneratorCoherent: AHNGenerator {
   ///The origin of the noise along the y axis in noise space. Changing this slightly will make the noise texture appear to move.
   ///
   ///The default value is `1.0`.
-  public var yValue: Float = 1{
+  open var yValue: Float = 1{
     didSet{
       dirty = true
     }
@@ -156,7 +156,7 @@ public class AHNGeneratorCoherent: AHNGenerator {
   ///The value for the third dimension when calculating the noise. Changing this slightly will make the noise texture appear to animate.
   ///
   ///Default is `1.0`.
-  public var zValue: Float = 1{
+  open var zValue: Float = 1{
     didSet{
       dirty = true
     }
@@ -167,7 +167,7 @@ public class AHNGeneratorCoherent: AHNGenerator {
   ///The value for the fourth dimension when calculating the noise. Changing this slightly will make the noise texture appear to animate.
   ///
   ///Default is `1.0`.
-  public var wValue: Float = 1{
+  open var wValue: Float = 1{
     didSet{
       dirty = true
     }

@@ -82,7 +82,7 @@ public protocol AHNTextureProvider: class{
    - parameter positions: The 2D positions in the texture for which to return greyscale values between `0.0 - 1.0`.
    - returns: The greyscale values between `0.0 - 1.0` for the specified pixel locations.
    */
-  func greyscaleValuesAtPositions(positions: [CGPoint]) -> [Float]
+  func greyscaleValuesAtPositions(_ positions: [CGPoint]) -> [Float]
   
   
   
@@ -92,7 +92,7 @@ public protocol AHNTextureProvider: class{
    - parameter positions: The 2D positions in the texture for which to return colour values for red, green, blue and alpha between `0.0 - 1.0`.
    - returns: The colour values between `0.0 - 1.0` for the specified pixel locations.
    */
-  func colourValuesAtPositions(positions: [CGPoint]) -> [(red: Float, green: Float, blue: Float, alpha: Float)]
+  func colourValuesAtPositions(_ positions: [CGPoint]) -> [(red: Float, green: Float, blue: Float, alpha: Float)]
 
   
   
@@ -138,15 +138,15 @@ extension AHNTextureProvider{
    - parameter positions: The 2D positions in the texture for which to return greyscale values between `0.0 - 1.0`.
    - returns: The greyscale values between `0.0 - 1.0` for the specified pixel locations.
    */
-  public func greyscaleValuesAtPositions(positions: [CGPoint]) -> [Float]{
+  public func greyscaleValuesAtPositions(_ positions: [CGPoint]) -> [Float]{
     let size = textureSize()
     let pixelCount = size.width * size.height
-    var array = [UInt8](count: pixelCount*4, repeatedValue: 0)
+    var array = [UInt8](repeating: 0, count: pixelCount*4)
     let region = MTLRegionMake2D(0, 0, size.width, size.height)
-    texture()?.getBytes(&array, bytesPerRow: size.width * strideof(UInt8)*4, fromRegion: region, mipmapLevel: 0)
+    texture()?.getBytes(&array, bytesPerRow: size.width * MemoryLayout<UInt8>.stride*4, from: region, mipmapLevel: 0)
     
-    var returnArray = [Float](count: positions.count, repeatedValue: 0)
-    for (i, position) in positions.enumerate(){
+    var returnArray = [Float](repeating: 0, count: positions.count)
+    for (i, position) in positions.enumerated(){
       if Int(position.x) >= size.width || Int(position.y) >= size.height{
         print("AHNoise: ERROR - Unable to get value for \(position) as it is outside the texture bounds")
         continue
@@ -165,15 +165,15 @@ extension AHNTextureProvider{
    - parameter positions: The 2D positions in the texture for which to return colour values for red, green, blue and alpha between `0.0 - 1.0`.
    - returns: The colour values between `0.0 - 1.0` for the specified pixel locations.
    */
-  public func colourValuesAtPositions(positions: [CGPoint]) -> [(red: Float, green: Float, blue: Float, alpha: Float)]{
+  public func colourValuesAtPositions(_ positions: [CGPoint]) -> [(red: Float, green: Float, blue: Float, alpha: Float)]{
     let size = textureSize()
     let pixelCount = size.width * size.height
-    var array = [UInt8](count: pixelCount*4, repeatedValue: 0)
+    var array = [UInt8](repeating: 0, count: pixelCount*4)
     let region = MTLRegionMake2D(0, 0, size.width, size.height)
-    texture()?.getBytes(&array, bytesPerRow: size.width * strideof(UInt8)*4, fromRegion: region, mipmapLevel: 0)
+    texture()?.getBytes(&array, bytesPerRow: size.width * MemoryLayout<UInt8>.stride*4, from: region, mipmapLevel: 0)
     
-    var returnArray = [(red: Float, green: Float, blue: Float, alpha: Float)](count: positions.count, repeatedValue: (0,0,0,0))
-    for (i, position) in positions.enumerate(){
+    var returnArray = [(red: Float, green: Float, blue: Float, alpha: Float)](repeating: (0,0,0,0), count: positions.count)
+    for (i, position) in positions.enumerated(){
       if Int(position.x) >= size.width || Int(position.y) >= size.height{
         print("AHNoise: ERROR - Unable to get value for \(position) at index \(i) as it is outside the texture bounds")
         continue
@@ -196,7 +196,7 @@ extension AHNTextureProvider{
     var array: [CGPoint] = []
     for i in 0..<size.width {
       for j in 0..<size.height {
-        array.append(CGPointMake(CGFloat(j), CGFloat(i)))
+        array.append(CGPoint(x: CGFloat(j), y: CGFloat(i)))
       }
     }
     return array

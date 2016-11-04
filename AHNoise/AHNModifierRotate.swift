@@ -26,14 +26,14 @@ import simd
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNModifierRotate: AHNModifier {
+open class AHNModifierRotate: AHNModifier {
 
   
   // MARK:- Properties
   
   
   ///The anchor point for horizontal axis about which to rotate the input. The default value is `0.5`.
-  public var xAnchor: Float = 0.5{
+  open var xAnchor: Float = 0.5{
     didSet{
       dirty = true
     }
@@ -42,7 +42,7 @@ public class AHNModifierRotate: AHNModifier {
   
   
   ///The anchor point for vertical axis about which to rotate the input. The default value is `0.5`.
-  public var yAnchor: Float = 0.5{
+  open var yAnchor: Float = 0.5{
     didSet{
       dirty = true
     }
@@ -51,7 +51,7 @@ public class AHNModifierRotate: AHNModifier {
   
   
   ///The angle to rotate the input by in radians. The default value is `0.0`.
-  public var angle: Float = 0.0{
+  open var angle: Float = 0.0{
     didSet{
       dirty = true
     }
@@ -60,7 +60,7 @@ public class AHNModifierRotate: AHNModifier {
   
   
   ///When true, the edges of the input are "cut" before the rotation, meaning the black areas off the the canvas are not rotated and any area not covered by the input after rotation is clear. If false, these areas are filled black. The default value is `true`.
-  public var cutEdges: Bool = true{
+  open var cutEdges: Bool = true{
     didSet{
       dirty = true
     }
@@ -106,15 +106,15 @@ public class AHNModifierRotate: AHNModifier {
   
   
   ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
-  public override func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
+  open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     var uniforms = vector_float4(xAnchor, yAnchor, angle, cutEdges ? 1 : 0)
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(strideof(vector_float4), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<vector_float4>.stride, options: MTLResourceOptions())
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, strideof(vector_float4))
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<vector_float4>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
   }
 }

@@ -29,7 +29,7 @@ struct VoronoiInputs {
 ///Generates a texture of discrete cells, useful for representing crystals or dried mud. The noise created lies within the range `0.0 - 1.0`.
 ///
 ///*Conforms to the `AHNTextureProvider` protocol.*
-public class AHNGeneratorVoronoi: AHNGeneratorCoherent {
+open class AHNGeneratorVoronoi: AHNGeneratorCoherent {
 
   
   // MARK:- Initialiser
@@ -58,12 +58,12 @@ public class AHNGeneratorVoronoi: AHNGeneratorCoherent {
   
   
   ///Encodes the required uniform values for this `AHNGenerator` subclass. This should never be called directly.
-  override public func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
+  override open func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     var uniforms = VoronoiInputs(pos: vector_float2(xValue, yValue), offsetStrength: offsetStrength, rotations: vector_float3(xRotation, yRotation, zRotation), octaves: Int32(octaves), persistence: persistence, frequency: frequency, lacunarity: lacunarity, zValue: zValue, wValue: wValue, sphereMap: sphereMap ? 1 : 0, seamless: seamless ? 1 : 0)
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(strideof(VoronoiInputs), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<VoronoiInputs>.stride, options: .storageModeShared)
     }
-    memcpy(uniformBuffer!.contents(), &uniforms, strideof(VoronoiInputs))
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<VoronoiInputs>.stride)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
   }
 }

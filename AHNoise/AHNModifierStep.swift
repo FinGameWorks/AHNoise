@@ -20,14 +20,14 @@ import simd
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNModifierStep: AHNModifier{
+open class AHNModifierStep: AHNModifier{
   
   
   // MARK:- Properties
   
   
   ///The low value (default value is `0.0`) to output if the noise value is lower than the `boundary`.
-  public var lowValue: Float = 0{
+  open var lowValue: Float = 0{
     didSet{
       dirty = true
     }
@@ -36,7 +36,7 @@ public class AHNModifierStep: AHNModifier{
   
   
   ///The hight value (default value is `1.0`) to output if the noise value is higher than the `boundary`.
-  public var highValue: Float = 1{
+  open var highValue: Float = 1{
     didSet{
       dirty = true
     }
@@ -45,7 +45,7 @@ public class AHNModifierStep: AHNModifier{
   
   
   ///The value at which to perform the step. Texture values lower than this are returned as `lowValue` and those above are returned as `highValue`. The default value is `0.5`.
-  public var boundary: Float = 0.5{
+  open var boundary: Float = 0.5{
     didSet{
       dirty = true
     }
@@ -88,15 +88,15 @@ public class AHNModifierStep: AHNModifier{
   
   
   ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
-  public override func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
+  open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     var uniforms = vector_float3(lowValue, highValue, boundary)
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(strideof(vector_float3), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<vector_float3>.stride, options: MTLResourceOptions())
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, strideof(vector_float3))
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<vector_float3>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
   }
 }

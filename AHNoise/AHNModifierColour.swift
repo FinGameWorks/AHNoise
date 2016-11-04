@@ -19,7 +19,7 @@ import simd
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNModifierColour: AHNModifier {
+open class AHNModifierColour: AHNModifier {
 
   
   // MARK:- Properties
@@ -55,7 +55,7 @@ public class AHNModifierColour: AHNModifier {
   
   
   ///The colour to apply to the input. Do not set directly, use the `colours` property.
-  private var _colours: [UIColor] = []{
+  fileprivate var _colours: [UIColor] = []{
     didSet{
       dirty = true
     }
@@ -64,7 +64,7 @@ public class AHNModifierColour: AHNModifier {
   
   
   ///The central position of the colouring range. Pixels with this value in the texture will output the `colour` due to a mix value of 1.0. Do not set directly, use the `colours` property. Default value is 0.5.
-  private var _positions: [Float] = []{
+  fileprivate var _positions: [Float] = []{
     didSet{
       dirty = true
     }
@@ -73,7 +73,7 @@ public class AHNModifierColour: AHNModifier {
   
   
   ///The intensities with which to apply the colours to in input. Do not set directly, use the `colours` property.
-  private var _intensities: [Float] = []{
+  fileprivate var _intensities: [Float] = []{
     didSet{
       dirty = true
     }
@@ -82,10 +82,10 @@ public class AHNModifierColour: AHNModifier {
   
   
   ///The colour to apply to the input, with associated positions and intensities.
-  public var colours: [(colour: UIColor, position: Float, intensity: Float)]{
+  open var colours: [(colour: UIColor, position: Float, intensity: Float)]{
     get{
       var tuples: [(colour: UIColor, position: Float, intensity: Float)] = []
-      for (i, colour) in _colours.enumerate(){
+      for (i, colour) in _colours.enumerated(){
         let tuple = (colour, _positions[i], _intensities[i])
         tuples.append(tuple)
       }
@@ -95,7 +95,7 @@ public class AHNModifierColour: AHNModifier {
       var newValue = newValue
       defaultsUsed = false
       if newValue.count == 0{
-        newValue = [(UIColor.whiteColor(), 0.5, 0.0)]
+        newValue = [(UIColor.white, 0.5, 0.0)]
         defaultsUsed = true
       }
       var colours: [UIColor] = []
@@ -156,7 +156,7 @@ public class AHNModifierColour: AHNModifier {
   
   
   ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
-  public override func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
+  open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     assert(_positions.count == _colours.count && _colours.count == _intensities.count, "AHNoise: ERROR - Number of colours to use must match the number of positions and intensities.")
     
     var red: CGFloat = 0
@@ -172,37 +172,37 @@ public class AHNModifierColour: AHNModifier {
     }
     
     // Create colour buffer and copy data
-    var bufferSize = strideof(vector_float4) * _colours.count
+    var bufferSize = MemoryLayout<vector_float4>.stride * _colours.count
     if uniformBuffer == nil || uniformBuffer?.length != bufferSize{
-      uniformBuffer = context.device.newBufferWithLength(bufferSize, options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.makeBuffer(length: bufferSize, options: MTLResourceOptions())
     }
     memcpy(uniformBuffer!.contents(), &uniformsColours, bufferSize)
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
     
     // Create positions buffer and copy data
-    bufferSize = strideof(Float) * _positions.count
+    bufferSize = MemoryLayout<Float>.stride * _positions.count
     if positionBuffer == nil || positionBuffer?.length != bufferSize{
-      positionBuffer = context.device.newBufferWithLength(bufferSize, options: .CPUCacheModeDefaultCache)
+      positionBuffer = context.device.makeBuffer(length: bufferSize, options: MTLResourceOptions())
     }
     memcpy(positionBuffer!.contents(), &_positions, bufferSize)
-    commandEncoder.setBuffer(positionBuffer, offset: 0, atIndex: 1)
+    commandEncoder.setBuffer(positionBuffer, offset: 0, at: 1)
     
     // Create intensities buffer and copy data
-    bufferSize = strideof(Float) * _intensities.count
+    bufferSize = MemoryLayout<Float>.stride * _intensities.count
     if intensityBuffer == nil || intensityBuffer?.length != bufferSize{
-      intensityBuffer = context.device.newBufferWithLength(bufferSize, options: .CPUCacheModeDefaultCache)
+      intensityBuffer = context.device.makeBuffer(length: bufferSize, options: MTLResourceOptions())
     }
     memcpy(intensityBuffer!.contents(), &_intensities, bufferSize)
-    commandEncoder.setBuffer(intensityBuffer, offset: 0, atIndex: 2)
+    commandEncoder.setBuffer(intensityBuffer, offset: 0, at: 2)
     
     // Create the colour count buffer and copy data
-    bufferSize = strideof(Float)
+    bufferSize = MemoryLayout<Float>.stride
     if countBuffer == nil{
-      countBuffer = context.device.newBufferWithLength(bufferSize, options: .CPUCacheModeDefaultCache)
+      countBuffer = context.device.makeBuffer(length: bufferSize, options: MTLResourceOptions())
     }
     var count = colourCount
     memcpy(countBuffer!.contents(), &count, bufferSize)
-    commandEncoder.setBuffer(countBuffer, offset: 0, atIndex: 3)
+    commandEncoder.setBuffer(countBuffer, offset: 0, at: 3)
   }
 
 
@@ -216,16 +216,16 @@ public class AHNModifierColour: AHNModifier {
   
   
   ///Organise the colours, positions and intensities arrays.
-  private func organiseColoursInOrder(){
+  fileprivate func organiseColoursInOrder(){
     assert(_positions.count == _colours.count && _colours.count == _intensities.count, "AHNoise: ERROR - Number of colours to use must match the number of positions and intensities.")
     var tuples: [(colour: UIColor, position: Float, intensity: Float)] = []
     
-    for (i, colour) in _colours.enumerate(){
+    for (i, colour) in _colours.enumerated(){
       let tuple = (colour, _positions[i], _intensities[i])
       tuples.append(tuple)
     }
     
-    tuples = tuples.sort({ $0.position < $1.position })
+    tuples = tuples.sorted(by: { $0.position < $1.position })
     
     var sortedColours: [UIColor] = []
     var sortedPositions: [Float] = []
@@ -243,7 +243,7 @@ public class AHNModifierColour: AHNModifier {
   
   
   ///Add a new colour, with corresponding position and intensity.
-  public func addColour(colour: UIColor, position: Float, intensity: Float){
+  open func addColour(_ colour: UIColor, position: Float, intensity: Float){
     if defaultsUsed{
       colours = [(colour, position, intensity)]
     }else{
@@ -254,7 +254,7 @@ public class AHNModifierColour: AHNModifier {
   
   
   ///Remove all colours.
-  public func removeAllColours(){
+  open func removeAllColours(){
     colours = []
   }
 }

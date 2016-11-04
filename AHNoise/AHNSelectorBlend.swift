@@ -18,7 +18,7 @@ import simd
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNSelectorBlend: AHNSelector {
+open class AHNSelectorBlend: AHNSelector {
   
 
   // MARK:- Initialiser

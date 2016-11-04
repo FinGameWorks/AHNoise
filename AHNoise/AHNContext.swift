@@ -20,7 +20,7 @@ import Metal
  
  `AHNModifier`, `AHNCombiner` and `AHNSelector` require an `AHNContext` to run, but reference the same `AHNContext` object as their input, which comes from the `Shared Context` class property for `AHNGenerators`.
  */
-public class AHNContext: NSObject {
+open class AHNContext: NSObject {
   
   
   // MARK:- Static Functions
@@ -31,14 +31,14 @@ public class AHNContext: NSObject {
   
   
   ///Set the `MTLDevice` of the `SharedContect` object to a specific object. An `MTLDevice` is a representation of a GPU, so apps for macOS (OSX) will want to set the device to the most powerful graphics hardware available, and not automatically default to onboard graphics.
-  static func SetContextDevice(device: MTLDevice){
+  static func SetContextDevice(_ device: MTLDevice){
     SharedContext = CreateContext(device)
   }
   
   
   
   ///- returns: An `AHNContext` object with the specified `MTLDevice`. If no `MTLDevice` is specified then the default is obtained from `MTLCreateSystemDefaultDevice()`.
-  private static func CreateContext(device: MTLDevice? = MTLCreateSystemDefaultDevice()) -> AHNContext{
+  fileprivate static func CreateContext(_ device: MTLDevice? = MTLCreateSystemDefaultDevice()) -> AHNContext{
     return AHNContext(device: device)
   }
   
@@ -50,17 +50,17 @@ public class AHNContext: NSObject {
   
   
   ///The `MTLDevice` used by the various noise classes to create buffers, pipelines and command encoders.
-  public let device: MTLDevice
+  open let device: MTLDevice
   
   
   
   ///The `MTLLibrary` that stores the `Metal` kernel functions used to create an manipulate noise.
-  public let library: MTLLibrary
+  open let library: MTLLibrary
   
   
   
   ///The `MTLCommandQueue` that is used to create `MTLCommandEncoder`s for each kernel.
-  public let commandQueue: MTLCommandQueue
+  open let commandQueue: MTLCommandQueue
   
   
   
@@ -80,7 +80,7 @@ public class AHNContext: NSObject {
    
    - parameter device: (Optional) The `MTLDevice` used throughout the `AHNoise` framework..
    */
-  private init(device: MTLDevice?) {
+  fileprivate init(device: MTLDevice?) {
     guard let device = device else{
       fatalError("AHNoise: Error creating MTLDevice).")
     }
@@ -91,6 +91,6 @@ public class AHNContext: NSObject {
     }
     self.library = library
     
-    commandQueue = device.newCommandQueue()
+    commandQueue = device.makeCommandQueue()
   }
 }

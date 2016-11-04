@@ -13,7 +13,7 @@ import simd
 ///Generates a box gradient texture comprising four linear gradients originating from the four texture edges.
 ///
 ///*Conforms to the `AHNTextureProvider` protocol.*
-public class AHNGeneratorGradientBox: AHNGenerator {
+open class AHNGeneratorGradientBox: AHNGenerator {
 
   
   
@@ -22,7 +22,7 @@ public class AHNGeneratorGradientBox: AHNGenerator {
   
   
   ///The falloff of the gradients originating from the left and right hand texture edges. The default value of `0.0` results in the horizontal gradients terminating at the centre of the texture, higher values cause the gradient to terminate closer to its originating edge.
-  public var xFallOff: Float = 0{
+  open var xFallOff: Float = 0{
     didSet{
       dirty = true
     }
@@ -31,7 +31,7 @@ public class AHNGeneratorGradientBox: AHNGenerator {
   
   
   ///The falloff of the gradients originating from the top and bottom texture edges. The default value of `0.0` results in the vertical gradients terminating at the centre of the texture, higher values cause the gradient to terminate closer to its originating edge.
-  public var yFallOff: Float = 0{
+  open var yFallOff: Float = 0{
     didSet{
       dirty = true
     }
@@ -73,15 +73,15 @@ public class AHNGeneratorGradientBox: AHNGenerator {
   
   
   ///Encodes the required uniform values for this `AHNGenerator` subclass. This should never be called directly.
-  override public func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
+  override open func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     var uniforms = GradientInputs(positions: vector_float4(xFallOff, yFallOff, 0, 0), offsetStrength: offsetStrength, rotations: vector_float3(xRotation, yRotation, zRotation))
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(strideof(GradientInputs), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<GradientInputs>.stride, options: .storageModeShared)
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, strideof(GradientInputs))
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<GradientInputs>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
   }
 }

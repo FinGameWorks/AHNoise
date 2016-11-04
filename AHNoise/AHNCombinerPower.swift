@@ -20,7 +20,7 @@ import simd
  
  The multiplication is done separately for each colour channel, so the result does not default to greyscale.
  */
-public class AHNCombinerPower: AHNCombiner{
+open class AHNCombinerPower: AHNCombiner{
 
   
   // MARK:- Initialiser

@@ -20,7 +20,7 @@ import simd
  
  Resultant values lower than `0.0` will show as black. The subtraction is done separately for each colour channel, so the result does not default to greyscale.
  */
-public class AHNCombinerSubtract: AHNCombiner {
+open class AHNCombinerSubtract: AHNCombiner {
   
   
   // MARK:- Initialiser

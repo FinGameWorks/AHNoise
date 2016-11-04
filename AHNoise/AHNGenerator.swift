@@ -15,13 +15,13 @@ import UIKit
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNGenerator: NSObject, AHNTextureProvider {
+open class AHNGenerator: NSObject, AHNTextureProvider {
   
   // MARK:- Properties
   
   
   ///The `AHNContext` that is being used by the `AHNTextureProvider` to communicate with the GPU. This is taken from the `SharedContext` class property of `AHNContext`.
-  public var context: AHNContext
+  open var context: AHNContext
   
   
   
@@ -31,7 +31,7 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   
   ///The `MTLBuffer` used to communicate the constant values used by the compute kernel to the GPU.
-  public var uniformBuffer: MTLBuffer?
+  open var uniformBuffer: MTLBuffer?
   
   
   
@@ -46,7 +46,7 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   
   ///The texture to offset pixels by in the x axis. Pixel values less than `0.5` offset to the left, and above `0.5` offset to the right.
-  public var xoffsetInput: AHNTextureProvider?{
+  open var xoffsetInput: AHNTextureProvider?{
     didSet{
       dirty = true
     }
@@ -55,7 +55,7 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   
   ///The texture to offset pixels by in the y axis. Pixel values less than `0.5` offset downwards, and above `0.5` offset upwards.
-  public var yoffsetInput: AHNTextureProvider?{
+  open var yoffsetInput: AHNTextureProvider?{
     didSet{
       dirty = true
     }
@@ -64,7 +64,7 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   
   ///The intensity of the effects of the `xoffsetInput` and `yoffsetInput`. A value of `0.0` results in no displacement. The default value is `0.2`.
-  public var offsetStrength: Float = 0.2{
+  open var offsetStrength: Float = 0.2{
     didSet{
       dirty = true
     }
@@ -73,7 +73,7 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   
   ///The angle (in radians) by which to rotate the 2D slice of the texture about the x axis of the 3D space of the geometric or noise `kernelFunction`. The default value is `0.0`.
-  public var xRotation: Float = 0{
+  open var xRotation: Float = 0{
     didSet{
       dirty = true
     }
@@ -82,7 +82,7 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   
   ///The angle (in radians) by which to rotate the 2D slice of the texture about the y axis of the 3D space of the geometric or noise `kernelFunction`. The default value is `0.0`.
-  public var yRotation: Float = 0{
+  open var yRotation: Float = 0{
     didSet{
       dirty = true
     }
@@ -91,7 +91,7 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   
   ///The angle (in radians) by which to rotate the 2D slice of the texture about the z axis of the 3D space of the geometric or noise `kernelFunction`. The default value is `0.0`.
-  public var zRotation: Float = 0{
+  open var zRotation: Float = 0{
     didSet{
       dirty = true
     }
@@ -109,14 +109,14 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   
   ///Indicates whether or not the `internalTexture` needs updating.
-  public var dirty: Bool = true
+  open var dirty: Bool = true
   
   
   
   /**
    The width of the output `MTLTexure` in pixels. The default value is `128`.
    */
-  public var textureWidth: Int = 128{
+  open var textureWidth: Int = 128{
     didSet{
       dirty = true
     }
@@ -127,7 +127,7 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   /**
    The height of the output `MTLTexure` in pixels. The default value is `128`.
    */
-  public var textureHeight: Int = 128{
+  open var textureHeight: Int = 128{
     didSet{
       dirty = true
     }
@@ -152,13 +152,13 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
    */
   public init(functionName: String){
     context = AHNContext.SharedContext
-    guard let kernelFunction = context.library.newFunctionWithName(functionName) else{
+    guard let kernelFunction = context.library.makeFunction(name: functionName) else{
       fatalError("AHNoise: Error loading function \(functionName).")
     }
     self.kernelFunction = kernelFunction
     
     do{
-      try pipeline = context.device.newComputePipelineStateWithFunction(kernelFunction)
+      try pipeline = context.device.makeComputePipelineState(function: kernelFunction)
     }catch let error{
       fatalError("AHNoise: Error creating pipeline state for \(functionName).\n\(error)")
     }
@@ -171,13 +171,13 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   override public required init(){
     context = AHNContext.SharedContext
     // Load the kernel function and compute pipeline state
-    guard let kernelFunction = context.library.newFunctionWithName("simplexGenerator") else{
+    guard let kernelFunction = context.library.makeFunction(name: "simplexGenerator") else{
       fatalError("AHNoise: Error loading function simplexGenerator.")
     }
     self.kernelFunction = kernelFunction
     
     do{
-      try pipeline = context.device.newComputePipelineStateWithFunction(kernelFunction)
+      try pipeline = context.device.makeComputePipelineState(function: kernelFunction)
     }catch let error{
       fatalError("AHNoise: Error creating pipeline state for simplexGenerator.\n\(error)")
     }
@@ -200,7 +200,7 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
    
    - parameter commandEncoder: The `MTLComputeCommandEncoder` used to run the kernel. This can be used to lazily create a buffer of data and add it to the argument table. Any buffer index can be used without affecting the rest of this class.
    */
-  public func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder){
+  open func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder){
   }
   
   
@@ -225,7 +225,7 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
    
    This should not need to be called manually as it is called by the `texture()` method automatically if the texture does not represent the current properties.
    */
-  public func updateTexture(){
+  open func updateTexture(){
     if internalTexture == nil{
       newInternalTexture()
     }
@@ -236,13 +236,13 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
     let threadGroupsCount = MTLSizeMake(8, 8, 1)
     let threadGroups = MTLSizeMake(textureWidth / threadGroupsCount.width, textureHeight / threadGroupsCount.height, 1)
     
-    let commandBuffer = context.commandQueue.commandBuffer()
+    let commandBuffer = context.commandQueue.makeCommandBuffer()
     
-    let commandEncoder = commandBuffer.computeCommandEncoder()
+    let commandEncoder = commandBuffer.makeComputeCommandEncoder()
     commandEncoder.setComputePipelineState(pipeline)
-    commandEncoder.setTexture(internalTexture, atIndex: 0)
-    commandEncoder.setTexture(xoffsetInput?.texture() ?? defaultDisplaceTexture!, atIndex: 1)
-    commandEncoder.setTexture(yoffsetInput?.texture() ?? defaultDisplaceTexture!, atIndex: 2)
+    commandEncoder.setTexture(internalTexture, at: 0)
+    commandEncoder.setTexture(xoffsetInput?.texture() ?? defaultDisplaceTexture!, at: 1)
+    commandEncoder.setTexture(yoffsetInput?.texture() ?? defaultDisplaceTexture!, at: 2)
 
     configureArgumentTableWithCommandencoder(commandEncoder)
     commandEncoder.dispatchThreadgroups(threadGroups, threadsPerThreadgroup: threadGroupsCount)
@@ -258,25 +258,25 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   ///Create a new `internalTexture` for the first time or whenever the texture is resized.
   func newInternalTexture(){
-    let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(.RGBA8Unorm, width: textureWidth, height: textureHeight, mipmapped: false)
-    internalTexture = context.device.newTextureWithDescriptor(textureDescriptor)
+    let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm, width: textureWidth, height: textureHeight, mipmapped: false)
+    internalTexture = context.device.makeTexture(descriptor: textureDescriptor)
     
     
     let grey: [UInt8] = [128, 128, 128, 255]
     var textureBytes: [UInt8] = []
     for _ in 0..<textureWidth*textureHeight{
-      textureBytes.appendContentsOf(grey)
+      textureBytes.append(contentsOf: grey)
     }
-    textureDescriptor.usage = .ShaderRead
-    defaultDisplaceTexture = context.device.newTextureWithDescriptor(textureDescriptor)
-    defaultDisplaceTexture?.replaceRegion(MTLRegionMake2D(0, 0, textureWidth, textureHeight), mipmapLevel: 0, withBytes: &textureBytes, bytesPerRow: 4*textureWidth)
+    textureDescriptor.usage = .shaderRead
+    defaultDisplaceTexture = context.device.makeTexture(descriptor: textureDescriptor)
+    defaultDisplaceTexture?.replace(region: MTLRegionMake2D(0, 0, textureWidth, textureHeight), mipmapLevel: 0, withBytes: &textureBytes, bytesPerRow: 4*textureWidth)
   }
   
   
   
   // Texture Provider
   ///- returns: The updated output `MTLTexture` for this module.
-  public func texture() -> MTLTexture?{
+  open func texture() -> MTLTexture?{
     if isDirty(){
       updateTexture()
     }
@@ -286,14 +286,14 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   
   ///- returns: The size of the output `MTLTexture`.
-  public func textureSize() -> MTLSize{
+  open func textureSize() -> MTLSize{
     return MTLSizeMake(textureWidth, textureHeight, 1)
   }
   
   
   
   ///- returns: A boolean value indicating whether or not the texture need updating to include updated properties.
-  public func isDirty() -> Bool {
+  open func isDirty() -> Bool {
     let dirtyProvider1 = xoffsetInput?.isDirty() ?? false
     let dirtyProvider2 = yoffsetInput?.isDirty() ?? false
     return dirtyProvider1 || dirtyProvider2 || dirty
@@ -302,7 +302,7 @@ public class AHNGenerator: NSObject, AHNTextureProvider {
   
   
   ///- returns: `True` as this a generator can always update.
-  public func canUpdate() -> Bool {
+  open func canUpdate() -> Bool {
     return true
   }
 }

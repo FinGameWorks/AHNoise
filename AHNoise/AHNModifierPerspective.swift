@@ -23,14 +23,14 @@ import simd
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNModifierPerspective: AHNModifier {
+open class AHNModifierPerspective: AHNModifier {
 
   
   // MARK:- Properties
   
   
   ///The amount to compress the texture horizontally to give the impression of stretching into the distance. Values over `3.3` will result in the texture wrapping. A value of `2 - 2.5` is a good place to start. The default value is `2`.
-  public var xCompression: Float = 2{
+  open var xCompression: Float = 2{
     didSet{
       dirty = true
     }
@@ -39,7 +39,7 @@ public class AHNModifierPerspective: AHNModifier {
   
   
   ///The amount to scale the texture vertically to give an impression of looking at the canvas at a shallow angle. This can range from `0.0 - 1.0`. at `0.0` the canvas has zero height, at `1.0` it retains its original height. The default value is `0.5`.
-  public var yScale: Float = 0.5{
+  open var yScale: Float = 0.5{
     didSet{
       dirty = true
     }
@@ -48,7 +48,7 @@ public class AHNModifierPerspective: AHNModifier {
   
   
   ///Allows the direction of the perspective to be skewed left (using negative values) or right (using positive values) to give the impression a horizontal receding angle. The default value is `0.0.`
-  public var direction: Float = 0{
+  open var direction: Float = 0{
     didSet{
       dirty = true
     }
@@ -94,15 +94,15 @@ public class AHNModifierPerspective: AHNModifier {
   
   
   ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
-  public override func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
+  open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     var uniforms = vector_float3(xCompression, yScale, direction)
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(strideof(vector_float3), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<vector_float3>.stride, options: MTLResourceOptions())
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, strideof(vector_float3))
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<vector_float3>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
   }
 }

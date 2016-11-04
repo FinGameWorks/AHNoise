@@ -20,14 +20,14 @@ import simd
  
  Resultant values larger than `1.0` will show as white. The addition is done separately for each colour channel, so the result does not default to greyscale.
  */
-public class AHNCombinerAdd: AHNCombiner {
+open class AHNCombinerAdd: AHNCombiner {
   
   
   // MARK:- Properties
   
   
   ///When set to `true` (`false` by default) the output value range is remapped back to `0.0 - 1.0` to prevent overly bright areas where the combination of inputs has exceeded `1.0`. Setting this to `true` results in the output being the average of the two inputs.
-  public var normalise: Bool = false{
+  open var normalise: Bool = false{
     didSet{
       dirty = true
     }
@@ -64,15 +64,15 @@ public class AHNCombinerAdd: AHNCombiner {
   
   
   ///Encodes the required uniform values for this `AHNCombiner` subclass. This should never be called directly.
-  public override func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
+  open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     var uniforms = normalise
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(strideof(Bool), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<Bool>.stride, options: .storageModeShared)
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, strideof(Bool))
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<Bool>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
   }
 }

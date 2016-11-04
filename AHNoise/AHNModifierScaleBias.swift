@@ -22,14 +22,14 @@ import simd
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNModifierScaleBias: AHNModifier {
+open class AHNModifierScaleBias: AHNModifier {
 
   
   // MARK:- Properties
   
   
   ///The multiplier to apply to the `input` value before the addition of `bias`. Default value is `1.0`.
-  public var scale: Float = 1{
+  open var scale: Float = 1{
     didSet{
       dirty = true
     }
@@ -38,7 +38,7 @@ public class AHNModifierScaleBias: AHNModifier {
   
   
   ///The constant to add to the `input` after it has been multiplied by `scale`. Can be negative. Default Value is `0.0`.
-  public var bias: Float = 0{
+  open var bias: Float = 0{
     didSet{
       dirty = true
     }
@@ -83,15 +83,15 @@ public class AHNModifierScaleBias: AHNModifier {
   
   
   ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
-  public override func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
+  open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     var uniforms = vector_float2(scale, bias)
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(strideof(vector_float2), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<vector_float2>.stride, options: MTLResourceOptions())
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, strideof(vector_float2))
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<vector_float2>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
   }
 }

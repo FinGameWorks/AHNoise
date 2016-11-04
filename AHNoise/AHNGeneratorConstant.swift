@@ -14,14 +14,14 @@ import simd
 ///Generates a solid colour based on red, green and blue colour values. Can be used to colourise other noise modules.
 ///
 ///*Conforms to the `AHNTextureProvider` protocol.*
-public class AHNGeneratorConstant: AHNGenerator {
+open class AHNGeneratorConstant: AHNGenerator {
   
   
   // MARK:- Properties
   
   
   ///The red component of the colour to be output in the range `0.0 - 1.0`. The default value is `0.5`.
-  public var red: Float = 0.5{
+  open var red: Float = 0.5{
     didSet{
       dirty = true
     }
@@ -30,7 +30,7 @@ public class AHNGeneratorConstant: AHNGenerator {
   
   
   ///The green component of the colour to be output in the range `0.0 - 1.0`. The default value is `0.5`.
-  public var green: Float = 0.5{
+  open var green: Float = 0.5{
     didSet{
       dirty = true
     }
@@ -39,7 +39,7 @@ public class AHNGeneratorConstant: AHNGenerator {
   
   
   ///The blue component of the colour to be output in the range `0.0 - 1.0`. The default value is `0.5`.
-  public var blue: Float = 0.5{
+  open var blue: Float = 0.5{
     didSet{
       dirty = true
     }
@@ -71,15 +71,15 @@ public class AHNGeneratorConstant: AHNGenerator {
   
   
   // Argument table update
-  public override func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
+  open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     var uniforms = vector_float3(red,green,blue)
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(strideof(vector_float3), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<vector_float3>.stride, options: .storageModeShared)
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, strideof(vector_float3))
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<vector_float3>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
   }
 }

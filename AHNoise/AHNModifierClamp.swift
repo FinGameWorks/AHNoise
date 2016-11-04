@@ -27,14 +27,14 @@ struct ClampModifierUniforms {
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNModifierClamp: AHNModifier {
+open class AHNModifierClamp: AHNModifier {
   
   
   // MARK:- Properties
   
   
   ///If `false` (default), the output is within the range `minimum - maximum, if `true` the output is remapped to cover the whole `0.0 - 1.0` range of the input.
-  public var normalise: Bool = false{
+  open var normalise: Bool = false{
     didSet{
       dirty = true
     }
@@ -43,7 +43,7 @@ public class AHNModifierClamp: AHNModifier {
   
   
   ///The maximum value of the range to clamp to. Values larger than this will be written to the output as this value. The default value is `1.0`.
-  public var minimum: Float = 0{
+  open var minimum: Float = 0{
     didSet{
       dirty = true
     }
@@ -52,7 +52,7 @@ public class AHNModifierClamp: AHNModifier {
   
   
   ///The minimum value of the range to clamp to. Values smaller than this will be written to the output as this value. The default value is `0.0`.
-  public var maximum: Float = 1{
+  open var maximum: Float = 1{
     didSet{
       dirty = true
     }
@@ -93,15 +93,15 @@ public class AHNModifierClamp: AHNModifier {
   
   
   ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
-  public override func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
+  open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     var uniforms = ClampModifierUniforms(normalise: normalise, clampValues: vector_float2(minimum, maximum))
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(strideof(ClampModifierUniforms), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<ClampModifierUniforms>.stride, options: MTLResourceOptions())
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, strideof(ClampModifierUniforms))
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<ClampModifierUniforms>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
   }
 }

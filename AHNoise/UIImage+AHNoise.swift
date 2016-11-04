@@ -8,44 +8,47 @@
 
 import UIKit
 
-func AHNReleaseDataCallback(info: UnsafeMutablePointer<Void>, data: UnsafePointer<Void>, size: Int){
-  free(UnsafeMutablePointer(data))
-}
 
 extension UIImage{
   
   ///Converts the input `MTLTexture` into a UIImage.
-  static func imageWithMTLTexture(texture: MTLTexture) -> UIImage{
-    assert(texture.pixelFormat == .RGBA8Unorm, "Pixel format of texture must be MTLPixelFormatBGRA8Unorm to create UIImage")
+  static func imageWithMTLTexture(_ texture: MTLTexture) -> UIImage{
+    assert(texture.pixelFormat == .rgba8Unorm, "Pixel format of texture must be MTLPixelFormatBGRA8Unorm to create UIImage")
     
     let imageByteCount: size_t = texture.width * texture.height * 4
     let imageBytes = malloc(imageByteCount)
     let bytesPerRow = texture.width * 4
     
     let region = MTLRegionMake2D(0, 0, texture.width, texture.height)
-    texture.getBytes(imageBytes, bytesPerRow: bytesPerRow, fromRegion: region, mipmapLevel: 0)
+    texture.getBytes(imageBytes!, bytesPerRow: bytesPerRow, from: region, mipmapLevel: 0)
     
-    let provider = CGDataProviderCreateWithData(nil, imageBytes, imageByteCount, AHNReleaseDataCallback)
+    let AHNReleaseDataCallback: CGDataProviderReleaseDataCallback = { (info: UnsafeMutableRawPointer?, data: UnsafeRawPointer, size: Int) -> () in
+      free(UnsafeMutableRawPointer(mutating: data))
+    }
+    
+    guard let provider = CGDataProvider(dataInfo: nil, data: imageBytes!, size: imageByteCount, releaseData: AHNReleaseDataCallback) else {
+      fatalError("AHNoise: Error creating CGDataProvider for conversion of MTLTexture to UIImage")
+    }
     let bitsPerComponent = 8
     let bitsPerPixel = 32
     let colourSpaceRef = CGColorSpaceCreateDeviceRGB()
-    let bitmapInfo: CGBitmapInfo = [CGBitmapInfo(rawValue: CGImageAlphaInfo.PremultipliedLast.rawValue), CGBitmapInfo.ByteOrder32Big]
-    let renderingIntent: CGColorRenderingIntent = .RenderingIntentDefault
+    let bitmapInfo: CGBitmapInfo = [CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue), CGBitmapInfo.byteOrder32Big]
+    let renderingIntent: CGColorRenderingIntent = .defaultIntent
     
-    let imageRef = CGImageCreate(
-      texture.width,
-      texture.height,
-      bitsPerComponent,
-      bitsPerPixel,
-      bytesPerRow,
-      colourSpaceRef,
-      bitmapInfo,
-      provider,
-      nil,
-      false,
-      renderingIntent)
+    let imageRef = CGImage(
+      width: texture.width,
+      height: texture.height,
+      bitsPerComponent: bitsPerComponent,
+      bitsPerPixel: bitsPerPixel,
+      bytesPerRow: bytesPerRow,
+      space: colourSpaceRef,
+      bitmapInfo: bitmapInfo,
+      provider: provider,
+      decode: nil,
+      shouldInterpolate: false,
+      intent: renderingIntent)
     
-    let image = UIImage(CGImage: imageRef!, scale: 0.0, orientation: UIImageOrientation.DownMirrored)
+    let image = UIImage(cgImage: imageRef!, scale: 0.0, orientation: UIImageOrientation.downMirrored)
     return image
   }
 }

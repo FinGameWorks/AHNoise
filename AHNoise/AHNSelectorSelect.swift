@@ -20,7 +20,7 @@ import simd
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNSelectorSelect: AHNSelector {
+open class AHNSelectorSelect: AHNSelector {
   
   
   // MARK:- Properties
@@ -78,18 +78,18 @@ public class AHNSelectorSelect: AHNSelector {
   
   
   ///Encodes the required uniform values for this `AHNSelector` subclass. This should never be called directly.
-  public override func configureArgumentTableWithCommandEncoder(commandEncoder: MTLComputeCommandEncoder) {
+  open override func configureArgumentTableWithCommandEncoder(_ commandEncoder: MTLComputeCommandEncoder) {
     var uniforms = vector_float2(transition, boundary)
     
     // Create the uniform buffer
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(strideof(vector_float2), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<vector_float2>.stride, options: MTLResourceOptions())
     }
     
     // Copy latest arguments
-    memcpy(uniformBuffer!.contents(), &uniforms, strideof(vector_float2))
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<vector_float2>.stride)
     
     // Set the buffer in the argument table
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
   }
 }

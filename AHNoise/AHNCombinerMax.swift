@@ -18,7 +18,7 @@ import simd
  
  For example a pixel with a noise value of `0.3` when compared with another pixel with a noise value of `0.6` will result in a noise value of `0.6`.
  */
-public class AHNCombinerMax: AHNCombiner {
+open class AHNCombinerMax: AHNCombiner {
   
   
   // MARK:- Initialiser

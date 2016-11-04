@@ -21,14 +21,14 @@ struct GradientInputs {
 ///Generates a linear gradient texture between two control points.
 ///
 ///*Conforms to the `AHNTextureProvider` protocol.*
-public class AHNGeneratorGradientLinear: AHNGenerator {
+open class AHNGeneratorGradientLinear: AHNGenerator {
   
   
   // MARK:- Properties
   
   
   ///The location along the x axis of the first control point. A value of `0.0` corresponds to the left hand edge and a value of `1.0` corresponds to the right hand edge. The default value is `0.0`.
-  public var startPositionX: Float = 0{
+  open var startPositionX: Float = 0{
     didSet{
       dirty = true
     }
@@ -37,7 +37,7 @@ public class AHNGeneratorGradientLinear: AHNGenerator {
   
   
   ///The location along the y axis of the first control point. A value of `0.0` corresponds to the bottom edge and a value of `1.0` corresponds to the top edge. The default value is `0.0`.
-  public var startPositionY: Float = 0{
+  open var startPositionY: Float = 0{
     didSet{
       dirty = true
     }
@@ -46,7 +46,7 @@ public class AHNGeneratorGradientLinear: AHNGenerator {
   
   
   ///The location along the x axis of the second control point. A value of `0.0` corresponds to the left hand edge and a value of `1.0` corresponds to the right hand edge. The default value is `1.0`.
-  public var endPositionX: Float = 1{
+  open var endPositionX: Float = 1{
     didSet{
       dirty = true
     }
@@ -55,7 +55,7 @@ public class AHNGeneratorGradientLinear: AHNGenerator {
   
   
   ///The location along the y axis of the second control point. A value of `0.0` corresponds to the bottom edge and a value of `1.0` corresponds to the top edge. The default value is `1.0`.
-  public var endPositionY: Float = 1{
+  open var endPositionY: Float = 1{
     didSet{
       dirty = true
     }
@@ -96,15 +96,15 @@ public class AHNGeneratorGradientLinear: AHNGenerator {
   
   
   ///Encodes the required uniform values for this `AHNGenerator` subclass. This should never be called directly.
-  override public func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
+  override open func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     var uniforms = GradientInputs(positions: vector_float4(startPositionX, startPositionY, endPositionX, endPositionY), offsetStrength: offsetStrength, rotations: vector_float3(xRotation, yRotation, zRotation))
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(strideof(GradientInputs), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<GradientInputs>.stride, options: .storageModeShared)
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, strideof(GradientInputs))
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<GradientInputs>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
   }
 }

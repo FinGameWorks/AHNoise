@@ -20,7 +20,7 @@ import simd
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNModifierRound: AHNModifier {
+open class AHNModifierRound: AHNModifier {
   
   
   // MARK:- Properties
@@ -31,7 +31,7 @@ public class AHNModifierRound: AHNModifier {
    
    Default value is `1.0`, causing no effect.
    */
-  public var roundValue: Float = 1{
+  open var roundValue: Float = 1{
     didSet{
       dirty = true
     }
@@ -73,15 +73,15 @@ public class AHNModifierRound: AHNModifier {
   
   
   ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
-  public override func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
+  open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     var uniforms = roundValue
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(strideof(Float), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<Float>.stride, options: MTLResourceOptions())
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, strideof(Float))
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<Float>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
   }
 }

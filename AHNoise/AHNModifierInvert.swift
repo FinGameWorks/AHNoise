@@ -17,7 +17,7 @@ import simd
   
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNModifierInvert: AHNModifier {
+open class AHNModifierInvert: AHNModifier {
 
   
   // MARK:- Initialiser

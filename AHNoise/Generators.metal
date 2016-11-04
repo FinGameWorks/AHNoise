@@ -100,7 +100,7 @@ float simplex3D(float xin, float yin, float zin)
   int jj = j & 255;
   int kk = k & 255;
   int gi0 = permMod12[ii+perm[jj+perm[kk]]];
-  int gi1 = permMod12[ii+i1+perm[jj+j1+perm[kk+k1]]];
+  int gi1 = permMod12[ii+1+perm[jj+j1+perm[kk+k1]]];
   int gi2 = permMod12[ii+i2+perm[jj+j2+perm[kk+k2]]];
   int gi3 = permMod12[ii+1+perm[jj+1+perm[kk+1]]];
   
@@ -245,15 +245,15 @@ float simplex4D(float xin, float yin, float zin, float win)
   float w4 = w0 - 1.0 + 4.0*G4;
   
   // Work out the hashed gradient indices of the five simplex corners
-  int ii = i & 255;
-  int jj = j & 255;
-  int kk = k & 255;
-  int ll = l & 255;
-  int gi0 = perm[ii+perm[jj+perm[kk+perm[ll]]]] % 32;
-  int gi1 = perm[ii+i1+perm[jj+j1+perm[kk+k1+perm[ll+l1]]]] % 32;
-  int gi2 = perm[ii+i2+perm[jj+j2+perm[kk+k2+perm[ll+l2]]]] % 32;
-  int gi3 = perm[ii+i3+perm[jj+j3+perm[kk+k3+perm[ll+l3]]]] % 32;
-  int gi4 = perm[ii+1+perm[jj+1+perm[kk+1+perm[ll+1]]]] % 32;
+  int ii = 1;//i & 255;
+  int jj = 1;//j & 255;
+  int kk = 1;//k & 255;
+  int ll = 1;//l & 255;
+  int gi0 = 1;//perm[ii+perm[jj+perm[kk+perm[ll]]]] % 32;
+  int gi1 = 1;//perm[ii+i1+perm[jj+j1+perm[kk+k1+perm[ll+l1]]]] % 32;
+  int gi2 = 1;//perm[ii+i2+perm[jj+j2+perm[kk+k2+perm[ll+l2]]]] % 32;
+  int gi3 = 1;//perm[ii+i3+perm[jj+j3+perm[kk+k3+perm[ll+l3]]]] % 32;
+  int gi4 = 1;//perm[ii+1+perm[jj+1+perm[kk+1+perm[ll+1]]]] % 32;
   
   // Calculate the contribution from the five corners
   float t0 = 0.6 - x0*x0 - y0*y0 - z0*z0 - w0*w0;

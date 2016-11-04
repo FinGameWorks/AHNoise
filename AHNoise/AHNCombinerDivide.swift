@@ -20,7 +20,7 @@ import simd
  
  Resultant values larger than `1.0` will show as white, and lower than `0.0` will show as black. The division is done separately for each colour channel, so the result does not default to greyscale.
  */
-public class AHNCombinerDivide: AHNCombiner {
+open class AHNCombinerDivide: AHNCombiner {
 
   
   // MARK:- Initialiser

@@ -24,14 +24,14 @@ import simd
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNModifierStretch: AHNModifier {
+open class AHNModifierStretch: AHNModifier {
 
   
   // MARK:- Properties
   
   
   ///The factor to stretch the input by in the horizontal axis. Default value is `1.0`.
-  public var xFactor: Float = 1{
+  open var xFactor: Float = 1{
     didSet{
       dirty = true
     }
@@ -40,7 +40,7 @@ public class AHNModifierStretch: AHNModifier {
   
   
   ///The factor to stretch the input by in the vertical axis. Default value is `1.0`.
-  public var yFactor: Float = 1{
+  open var yFactor: Float = 1{
     didSet{
       dirty = true
     }
@@ -49,7 +49,7 @@ public class AHNModifierStretch: AHNModifier {
   
   
   ///The anchor point for horizontal axis about which to stretch the input. Default is `0.5`.
-  public var xAnchor: Float = 0.5{
+  open var xAnchor: Float = 0.5{
     didSet{
       dirty = true
     }
@@ -58,7 +58,7 @@ public class AHNModifierStretch: AHNModifier {
   
   
   ///The anchor point for vertical axis about which to stretch the input. Default is `0.5`.
-  public var yAnchor: Float = 0.5{
+  open var yAnchor: Float = 0.5{
     didSet{
       dirty = true
     }
@@ -101,15 +101,15 @@ public class AHNModifierStretch: AHNModifier {
   
   
   ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
-  public override func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
+  open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     var uniforms = vector_float4(xFactor, yFactor, xAnchor, yAnchor)
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(strideof(vector_float4), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<vector_float4>.stride, options: MTLResourceOptions())
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, strideof(vector_float4))
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<vector_float4>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
   }
 }

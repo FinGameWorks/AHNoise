@@ -16,14 +16,14 @@ import simd
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNSelector: NSObject, AHNTextureProvider{
+open class AHNSelector: NSObject, AHNTextureProvider{
   
   
   // MARK:- Properties
   
   
   ///The `AHNContext` that is being used by the `AHNTextureProvider` to communicate with the GPU. This is recovered from the first `AHNGenerator` class that is encountered in the chain of classes.
-  public var context: AHNContext
+  open var context: AHNContext
   
   
   
@@ -33,7 +33,7 @@ public class AHNSelector: NSObject, AHNTextureProvider{
   
   
   ///The `MTLBuffer` used to transfer the constant values used by the compute kernel to the GPU.
-  public var uniformBuffer: MTLBuffer?
+  open var uniformBuffer: MTLBuffer?
   
   
   
@@ -52,12 +52,12 @@ public class AHNSelector: NSObject, AHNTextureProvider{
   
   
   ///Indicates whether or not the `internalTexture` needs updating.
-  public var dirty: Bool = true
+  open var dirty: Bool = true
   
   
   
   ///The first input that will be combined with `provider2` using `selector` to provide the output.
-  public var provider: AHNTextureProvider?{
+  open var provider: AHNTextureProvider?{
     didSet{
       dirty = true
     }
@@ -66,7 +66,7 @@ public class AHNSelector: NSObject, AHNTextureProvider{
   
   
   ///The second input that will be combined with `provider` using `selector` to provide the output.
-  public var provider2: AHNTextureProvider?{
+  open var provider2: AHNTextureProvider?{
     didSet{
       dirty = true
     }
@@ -75,7 +75,7 @@ public class AHNSelector: NSObject, AHNTextureProvider{
   
   
   ///The `AHNTextureProvider` that selects which input to write to the output `MTLTexture` depending on its value at each pixel.
-  public var selector: AHNTextureProvider?{
+  open var selector: AHNTextureProvider?{
     didSet{
       dirty = true
     }
@@ -88,9 +88,9 @@ public class AHNSelector: NSObject, AHNTextureProvider{
    
    This is dictated by the width of the texture of the first input `AHNTextureProvider`. If there is no input, the default width is `128` pixels.
    */
-  public var textureWidth: Int{
+  open var textureWidth: Int{
     get{
-      if let provider = provider, provider2 = provider2, selector = selector{
+      if let provider = provider, let provider2 = provider2, let selector = selector{
         return max(provider.textureSize().width, provider2.textureSize().width, selector.textureSize().width)
       }else{
         return 128
@@ -105,9 +105,9 @@ public class AHNSelector: NSObject, AHNTextureProvider{
    
    This is dictated by the height of the texture of the first input `AHNTextureProvider`. If there is no input, the default height is `128` pixels.
    */
-  public var textureHeight: Int{
+  open var textureHeight: Int{
     get{
-      if let provider = provider, provider2 = provider2, selector = selector{
+      if let provider = provider, let provider2 = provider2, let selector = selector{
         return max(provider.textureSize().height, provider2.textureSize().height, selector.textureSize().height)
       }else{
         return 128
@@ -151,13 +151,13 @@ public class AHNSelector: NSObject, AHNTextureProvider{
     context = AHNContext.SharedContext
     
     // Load the kernel function and compute pipeline state
-    guard let kernelFunction = context.library.newFunctionWithName(functionName) else{
+    guard let kernelFunction = context.library.makeFunction(name: functionName) else{
       fatalError("AHNoise: Error loading function \(functionName).")
     }
     self.kernelFunction = kernelFunction
     
     do{
-      try pipeline = context.device.newComputePipelineStateWithFunction(kernelFunction)
+      try pipeline = context.device.makeComputePipelineState(function: kernelFunction)
     }catch let error{
       fatalError("AHNoise: Error creating pipeline state for \(functionName).\n\(error)")
     }
@@ -171,13 +171,13 @@ public class AHNSelector: NSObject, AHNTextureProvider{
     context = AHNContext.SharedContext
 
     // Load the kernel function and compute pipeline state
-    guard let kernelFunction = context.library.newFunctionWithName("simplexGenerator") else{
+    guard let kernelFunction = context.library.makeFunction(name: "simplexGenerator") else{
       fatalError("AHNoise: Error loading function simplexGenerator.")
     }
     self.kernelFunction = kernelFunction
     
     do{
-      try pipeline = context.device.newComputePipelineStateWithFunction(kernelFunction)
+      try pipeline = context.device.makeComputePipelineState(function: kernelFunction)
     }catch let error{
       fatalError("AHNoise: Error creating pipeline state for simplexGenerator.\n\(error)")
     }
@@ -205,7 +205,7 @@ public class AHNSelector: NSObject, AHNTextureProvider{
    
    - parameter commandEncoder: The `MTLComputeCommandEncoder` used to run the kernel. This can be used to lazily create a buffer of data and add it to the argument table. Any buffer index can be used without affecting the rest of this class.
    */
-  public func configureArgumentTableWithCommandEncoder(commandEncoder: MTLComputeCommandEncoder){
+  open func configureArgumentTableWithCommandEncoder(_ commandEncoder: MTLComputeCommandEncoder){
   }
   
   
@@ -228,8 +228,8 @@ public class AHNSelector: NSObject, AHNTextureProvider{
    
    This should not need to be called manually as it is called by the `texture()` method automatically if the texture does not represent the current `AHNTextureProvider` properties.
    */
-  public func updateTexture(){
-    guard let provider1 = provider?.texture(), provider2 = provider2?.texture(), selector = selector?.texture() else { return }
+  open func updateTexture(){
+    guard let provider1 = provider?.texture(), let provider2 = provider2?.texture(), let selector = selector?.texture() else { return }
     
     // Create the internalTexture if it equals nil or is the wrong size.
     if internalTexture == nil{
@@ -242,14 +242,14 @@ public class AHNSelector: NSObject, AHNTextureProvider{
     let threadGroupsCount = MTLSizeMake(8, 8, 1)
     let threadGroups = MTLSizeMake(textureWidth / threadGroupsCount.width, textureHeight / threadGroupsCount.height, 1)
     
-    let commandBuffer = context.commandQueue.commandBuffer()
+    let commandBuffer = context.commandQueue.makeCommandBuffer()
     
-    let commandEncoder = commandBuffer.computeCommandEncoder()
+    let commandEncoder = commandBuffer.makeComputeCommandEncoder()
     commandEncoder.setComputePipelineState(pipeline)
-    commandEncoder.setTexture(provider1, atIndex: 0)
-    commandEncoder.setTexture(provider2, atIndex: 1)
-    commandEncoder.setTexture(selector, atIndex: 2)
-    commandEncoder.setTexture(internalTexture, atIndex: 3)
+    commandEncoder.setTexture(provider1, at: 0)
+    commandEncoder.setTexture(provider2, at: 1)
+    commandEncoder.setTexture(selector, at: 2)
+    commandEncoder.setTexture(internalTexture, at: 3)
     
     // Encode the uniform buffer
     configureArgumentTableWithCommandEncoder(commandEncoder)
@@ -265,14 +265,14 @@ public class AHNSelector: NSObject, AHNTextureProvider{
   
   ///Create a new `internalTexture` for the first time or whenever the texture is resized.
   func newInternalTexture(){
-    let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(.RGBA8Unorm, width: textureWidth, height: textureHeight, mipmapped: false)
-    internalTexture = context.device.newTextureWithDescriptor(textureDescriptor)
+    let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm, width: textureWidth, height: textureHeight, mipmapped: false)
+    internalTexture = context.device.makeTexture(descriptor: textureDescriptor)
   }
   
   
   
   ///- returns: The updated output `MTLTexture` for the `AHNSelector`.
-  public func texture() -> MTLTexture?{
+  open func texture() -> MTLTexture?{
     if isDirty(){
       updateTexture()
     }
@@ -282,21 +282,21 @@ public class AHNSelector: NSObject, AHNTextureProvider{
   
   
   ///- returns: The MTLSize of the the output `MTLTexture`. If no size has been explicitly set, the default value returned is `128x128` pixels.
-  public func textureSize() -> MTLSize{
+  open func textureSize() -> MTLSize{
     return MTLSizeMake(textureWidth, textureHeight, 1)
   }
   
   
   
   ///- returns: The input `AHNTextureProvider` that provides the input `MTLTexture` to the `AHNSelector`. This is taken from `input1`. If there is no input, returns `nil`.
-  public func textureProvider() -> AHNTextureProvider?{
+  open func textureProvider() -> AHNTextureProvider?{
     return provider
   }
   
   
   
   ///- returns: `False` if all inputs and the `internalTexture` do not need updating.
-  public func isDirty() -> Bool {
+  open func isDirty() -> Bool {
     let dirtyProvider1 = provider?.isDirty() ?? false
     let dirtyProvider2 = provider2?.isDirty() ?? false
     let dirtySelector = selector?.isDirty() ?? false
@@ -307,7 +307,7 @@ public class AHNSelector: NSObject, AHNTextureProvider{
   
   
   ///- returns: `False` if either of the two inputs or the selector is not set.
-  public func canUpdate() -> Bool {
+  open func canUpdate() -> Bool {
     return provider != nil && provider2 != nil && selector != nil
   }
 }

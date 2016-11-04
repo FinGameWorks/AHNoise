@@ -26,7 +26,7 @@ import simd
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNModifierSwirl: AHNModifier {
+open class AHNModifierSwirl: AHNModifier {
   
   
   // MARK:- Properties
@@ -34,7 +34,7 @@ public class AHNModifierSwirl: AHNModifier {
   
   
   ///The anchor point for horizontal axis about which to swirl the input. Default is `0.5`.
-  public var xAnchor: Float = 0.5{
+  open var xAnchor: Float = 0.5{
     didSet{
       dirty = true
     }
@@ -43,7 +43,7 @@ public class AHNModifierSwirl: AHNModifier {
   
   
   ///The anchor point for vertical axis about which to swirl the input. Default is `0.5`.
-  public var yAnchor: Float = 0.5{
+  open var yAnchor: Float = 0.5{
     didSet{
       dirty = true
     }
@@ -52,7 +52,7 @@ public class AHNModifierSwirl: AHNModifier {
   
   
   ///The intensity of the swirl. Default is `0.5`.
-  public var intensity: Float = 0.5{
+  open var intensity: Float = 0.5{
     didSet{
       dirty = true
     }
@@ -61,7 +61,7 @@ public class AHNModifierSwirl: AHNModifier {
   
   
   ///When `true`, the edges of the input are "cut" before the swirl, meaning the black areas off the the canvas are not rotated and any area not covered by the input after rotation is clear. If `false`, these areas are filled black.
-  public var cutEdges: Bool = true{
+  open var cutEdges: Bool = true{
     didSet{
       dirty = true
     }
@@ -98,15 +98,15 @@ public class AHNModifierSwirl: AHNModifier {
   
   
   ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
-  public override func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
+  open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     var uniforms = vector_float4(xAnchor, yAnchor, intensity, cutEdges ? 1 : 0)
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(strideof(vector_float4), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<vector_float4>.stride, options: MTLResourceOptions())
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, strideof(vector_float4))
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<vector_float4>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
   }
 }

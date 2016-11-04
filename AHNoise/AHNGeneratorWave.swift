@@ -21,7 +21,7 @@ struct WaveInputs {
 ///Generates a series of sinusoidal waves represented by black and white lines.
 ///
 ///*Conforms to the `AHNTextureProvider` protocol.*
-public class AHNGeneratorWave: AHNGenerator  {
+open class AHNGeneratorWave: AHNGenerator  {
   
   
   // MARK:- Properties
@@ -29,7 +29,7 @@ public class AHNGeneratorWave: AHNGenerator  {
   
   
   ///Increases the number and compactness of waves visible in the texture. The default value is `1.0`.
-  public var frequency: Float = 1{
+  open var frequency: Float = 1{
     didSet{
       dirty = true
     }
@@ -67,15 +67,15 @@ public class AHNGeneratorWave: AHNGenerator  {
   
   
   ///Encodes the required uniform values for this `AHNGenerator` subclass. This should never be called directly.
-  override public func configureArgumentTableWithCommandencoder(commandEncoder: MTLComputeCommandEncoder) {
+  override open func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     var uniforms = WaveInputs(frequency: frequency, offsetStrength: offsetStrength, rotations: vector_float3(xRotation, yRotation, zRotation))
 
     if uniformBuffer == nil{
-      uniformBuffer = context.device.newBufferWithLength(strideof(WaveInputs), options: .CPUCacheModeDefaultCache)
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<WaveInputs>.stride, options: .storageModeShared)
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, strideof(WaveInputs))
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<WaveInputs>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, atIndex: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
   }  
 }

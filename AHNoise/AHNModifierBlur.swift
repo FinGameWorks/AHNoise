@@ -18,14 +18,14 @@ import MetalPerformanceShaders
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNModifierBlur: AHNModifier {
+open class AHNModifierBlur: AHNModifier {
   
   
   // MARK:- Properties
   
   
   ///The radius of the Gaussian blur. The default value is `3.0`.
-  public var radius: Float = 3{
+  open var radius: Float = 3{
     didSet{
       dirty = true
     }
@@ -54,7 +54,7 @@ public class AHNModifierBlur: AHNModifier {
     super.init(functionName: "normalMapModifier")
     usesMPS = true
     kernel = MPSImageGaussianBlur(device: context.device, sigma: radius)
-    kernel.edgeMode = .Clamp
+    kernel.edgeMode = .clamp
   }
   
   
@@ -69,10 +69,10 @@ public class AHNModifierBlur: AHNModifier {
   
   
   ///Encodes the `Metal Performance Shader` into the command buffer. This is called by the superclass and should not be called manually.
-  override public func addMetalPerformanceShaderToBuffer(commandBuffer: MTLCommandBuffer) {
+  override open func addMetalPerformanceShaderToBuffer(_ commandBuffer: MTLCommandBuffer) {
     guard let texture = provider?.texture() else { return }
     kernel = MPSImageGaussianBlur(device: context.device, sigma: radius)
-    kernel.edgeMode = .Clamp
-    kernel.encodeToCommandBuffer(commandBuffer, sourceTexture: texture, destinationTexture: internalTexture!)
+    kernel.edgeMode = .clamp
+    kernel.encode(commandBuffer: commandBuffer, sourceTexture: texture, destinationTexture: internalTexture!)
   }
 }

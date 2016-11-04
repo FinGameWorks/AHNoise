@@ -19,14 +19,14 @@ import MetalKit
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-public class AHNModifierMapNormal: NSObject, AHNTextureProvider {
+open class AHNModifierMapNormal: NSObject, AHNTextureProvider {
   
   
   // MARK:- Properties
   
   
   ///A value that magnifies the effect of the generated normal map. The default value of `1.0` indicates no magnification.
-  public var intensity: Float = 1.0{
+  open var intensity: Float = 1.0{
     didSet{
       dirty = true
     }
@@ -35,7 +35,7 @@ public class AHNModifierMapNormal: NSObject, AHNTextureProvider {
 
   
   ///A value in teh range `0.0 - 1.0` indicating how much the input should be smoothed before the normal map is generated. The default value is `0.0`.
-  public var smoothing: Float = 0{
+  open var smoothing: Float = 0{
     didSet{
       dirty = true
     }
@@ -44,7 +44,7 @@ public class AHNModifierMapNormal: NSObject, AHNTextureProvider {
   
   
   ///The `AHNContext` that is being used by the `AHNTextureProvider` to communicate with the GPU. This is recovered from the first `AHNGenerator` class that is encountered in the chain of classes.
-  public var context: AHNContext
+  open var context: AHNContext
   
   
   
@@ -54,7 +54,7 @@ public class AHNModifierMapNormal: NSObject, AHNTextureProvider {
   
   
   ///Indicates whether or not the `internalTexture` needs updating.
-  public var dirty: Bool = true
+  open var dirty: Bool = true
   
   
   
@@ -68,7 +68,7 @@ public class AHNModifierMapNormal: NSObject, AHNTextureProvider {
    
    This is dictated by the width of the texture of the input `AHNTextureProvider`. If there is no input, the default width is `128` pixels.
    */
-  public var textureWidth: Int{
+  open var textureWidth: Int{
     get{
       return provider?.textureSize().width ?? 128
     }
@@ -81,7 +81,7 @@ public class AHNModifierMapNormal: NSObject, AHNTextureProvider {
    
    This is dictated by the height of the texture of the input `AHNTextureProvider`. If there is no input, the default height is `128` pixels.
    */
-  public var textureHeight: Int{
+  open var textureHeight: Int{
     get{
       return provider?.textureSize().height ?? 128
     }
@@ -126,7 +126,7 @@ public class AHNModifierMapNormal: NSObject, AHNTextureProvider {
    
    This should not need to be called manually as it is called by the `texture()` method automatically if the texture does not represent the current `AHNTextureProvider` properties.
    */
-  public func updateTexture(){
+  open func updateTexture(){
     if provider == nil {return}
     
     if internalTexture == nil{
@@ -139,16 +139,16 @@ public class AHNModifierMapNormal: NSObject, AHNTextureProvider {
     
     guard var image = provider?.uiImage() else { return }
     guard var ciImage = CIImage(image: image) else { return }
-    ciImage = ciImage.imageByApplyingTransform(CGAffineTransformMakeScale(1, -1))
+    ciImage = ciImage.applying(CGAffineTransform(scaleX: 1, y: -1))
     let ciContext = CIContext(options: nil)
-    image = UIImage(CGImage: ciContext.createCGImage(ciImage, fromRect: ciImage.extent))
+    image = UIImage(cgImage: ciContext.createCGImage(ciImage, from: ciImage.extent)!)
     
     let sprite = SKTexture(image: image)
     
-    let normal = sprite.textureByGeneratingNormalMapWithSmoothness(CGFloat(smoothing), contrast: CGFloat(intensity))
+    let normal = sprite.generatingNormalMap(withSmoothness: CGFloat(smoothing), contrast: CGFloat(intensity))
     let loader = MTKTextureLoader(device: context.device)
     do{
-      try internalTexture = loader.newTextureWithCGImage(normal.CGImage(), options: nil)
+      try internalTexture = loader.newTexture(with: normal.cgImage(), options: nil)
     }catch{
       fatalError()
     }
@@ -159,14 +159,14 @@ public class AHNModifierMapNormal: NSObject, AHNTextureProvider {
   
   ///Create a new `internalTexture` for the first time or whenever the texture is resized.
   func newInternalTexture(){
-    let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(.RGBA8Unorm, width: textureWidth, height: textureHeight, mipmapped: false)
-    internalTexture = context.device.newTextureWithDescriptor(textureDescriptor)
+    let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm, width: textureWidth, height: textureHeight, mipmapped: false)
+    internalTexture = context.device.makeTexture(descriptor: textureDescriptor)
   }
   
   
   
   ///- returns: The updated output `MTLTexture` for this module.
-  public func texture() -> MTLTexture?{
+  open func texture() -> MTLTexture?{
     if isDirty(){
       updateTexture()
     }
@@ -176,21 +176,21 @@ public class AHNModifierMapNormal: NSObject, AHNTextureProvider {
   
   
   ///- returns: The MTLSize of the the output `MTLTexture`. If no size has been explicitly set, the default value returned is `128x128` pixels.
-  public func textureSize() -> MTLSize{
+  open func textureSize() -> MTLSize{
     return MTLSizeMake(textureWidth, textureHeight, 1)
   }
   
   
   
   ///- returns: The input `AHNTextureProvider` that provides the input `MTLTexture` to the `AHNModifier`. This is taken from the `input`. If there is no `input`, returns `nil`.
-  public func textureProvider() -> AHNTextureProvider?{
+  open func textureProvider() -> AHNTextureProvider?{
     return provider
   }
   
   
   
   ///- returns: `False` if the input and the `internalTexture` do not need updating.
-  public func isDirty() -> Bool {
+  open func isDirty() -> Bool {
     if let p = provider{
       return p.isDirty() || dirty
     }else{
@@ -201,7 +201,7 @@ public class AHNModifierMapNormal: NSObject, AHNTextureProvider {
   
   
   ///- returns: `False` if the `provider` property is not set.
-  public func canUpdate() -> Bool {
+  open func canUpdate() -> Bool {
     return provider != nil
   }
 }
