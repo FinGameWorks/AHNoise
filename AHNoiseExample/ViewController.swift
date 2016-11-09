@@ -64,6 +64,7 @@ class ViewController: UIViewController {
     stretch2.yFactor = 4
     
     let imageView = UIImageView(frame: view.bounds)
+    imageView.contentMode = .scaleAspectFit
     view.addSubview(imageView)
     imageView.image = stretch2.uiImage()
   }

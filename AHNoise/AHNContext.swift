@@ -61,20 +61,19 @@ open class AHNContext: NSObject {
   
   
   
-  ///An `MTLBuffer` used in 3D Simplex noise calculations
-  open var grad3Buffer: MTLBuffer
+  internal var grad3Buffer: MTLBuffer
   
   
   
-  open var grad4Buffer: MTLBuffer
+  internal var grad4Buffer: MTLBuffer
   
   
   
-  open var permBuffer: MTLBuffer
+  internal var permBuffer: MTLBuffer
   
   
   
-  open var permMod12Buffer: MTLBuffer
+  internal var permMod12Buffer: MTLBuffer
   
   
   
